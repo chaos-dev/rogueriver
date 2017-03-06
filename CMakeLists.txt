@@ -9,6 +9,9 @@ set (RogueRiver_VERSION_MINOR 1)
 # We require C++14
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
+# Manually specify C++14 for Travis CI
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+
 
 # Our CMake Modules (For SDL2)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake-modules)
