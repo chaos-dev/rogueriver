@@ -1,6 +1,6 @@
  #!/bin/bash
 
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 2.8.0)
 
 # RPATH Settings
 # These settings are used to link the libtcod libraries with the executable
