@@ -18,31 +18,39 @@ set(CMAKE_USE_RELATIVE_PATHS True)
 # Our CMake Modules (For SDL2)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake-modules)
 
-# When building, put the executable in the root directory
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-
-# Add bearlibterminal
+# Find out if this is a 32 or 64 bit build
 if( CMAKE_SIZEOF_VOID_P EQUAL 8)
     MESSAGE(STATUS "64 bit system detected.")
     SET( EX_PLATFORM 64)
     SET( EX_PLATFORM_NAME "x64")
-    SET( LIB_PATHS lib/Linux64 lib/OSX lib/Windows64)
 else ()
     MESSAGE(STATUS "32 bit system detected.")
     SET( EX_PLATFORM 32)
     SET( EX_PLATFORM_NAME "x86")
-    SET( LIB_PATHS lib/Linux32 lib/OSX lib/Windows32)
 endif ()
-if (${WIN32}) # Windows doesn't automatically include both .lib and .dll
+
+# When building, put the executable in the root directory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+# Add bearlibterminal
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(LIB_PATHS lib/OSX)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(LIB_PATHS "lib/Windows${EX_PLATFORM}")
+else ()
+    set(LIB_PATHS "lib/Linux${EX_PLATFORM}")
+endif ()
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
+    # Windows doesn't automatically include both .lib and .dll
     if (${CMAKE_CXX_COMPILER_ID} EQUAL "MSVC")
         set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
     else (${CMAKE_CXX_COMPILER_ID} EQUAL "MSVC")
         set(CMAKE_FIND_LIBRARY_SUFFIXES ".dll")
     endif (${CMAKE_CXX_COMPILER_ID} EQUAL "MSVC")
     find_library(bearlibterminal NAME BearLibTerminal PATHS ${LIB_PATHS})
-else (${WIN32})
+else (${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
     find_library(bearlibterminal NAME BearLibTerminal PATHS ${LIB_PATHS})
-endif (${WIN32})
+endif (${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 message(STATUS "Found BearLibTerminal at: ${bearlibterminal}")
 
 # Make the project
@@ -67,7 +75,7 @@ set(CPACK_PACKAGE_NAME "RogueRiver")
 set(CPACK_PACKAGE_VERSION_MAJOR ${RogueRiver_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${RogueRiver_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${RogueRiver_VERSION_PATCH})
-set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${EX_PLATFORM_NAME}")
+set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${EX_PLATFORM_NAME}-${CMAKE_CXX_COMPILER_ID}")
 include(CPack)
 
 
