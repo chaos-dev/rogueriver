@@ -16,4 +16,4 @@ after_build:
     - cpack
 
 artifacts:
-  - path: 'RogueRiver.zip'
+  - path: '**\*.zip'
