@@ -1,9 +1,9 @@
 # Rogue River: Obol of Charon
 A roguelike where you boat down the 5 rivers of the Greek Underworld and battle mythical monsters.
 
-Linux: [![Build Status](https://travis-ci.org/chaos-dev/rogueriver.svg)](https://travis-ci.org/chaos-dev/rogueriver)
+**Linux/OSX**: [![Build Status](https://travis-ci.org/chaos-dev/rogueriver.svg)](https://travis-ci.org/chaos-dev/rogueriver)
 
-Windows: [![Build status](https://ci.appveyor.com/api/projects/status/pxr3eg4fyw70s0am/branch/master?svg=true)](https://ci.appveyor.com/project/chaos-dev/rogueriver/branch/master)
+**Windows**: [![Build status](https://ci.appveyor.com/api/projects/status/pxr3eg4fyw70s0am/branch/master?svg=true)](https://ci.appveyor.com/project/chaos-dev/rogueriver/branch/master)
 
 ## Compiling from Source
 
