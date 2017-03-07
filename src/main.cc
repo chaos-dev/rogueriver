@@ -5,27 +5,28 @@
  *      Author: cfyz
  */
 
-#include "Common.hpp"
+#include "BearLibTerminal.h"
 
-int main()
-{
+class Engine {
+ protected:
+  int width, height;
+  const int symbol = 0x2588;
+ public:
+  Engine();
+  ~Engine();
+  void Run();
+};
 
+Engine::Engine() {
 	terminal_open();
+	terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=27x5");
+};
 
-	auto reset = []()
-	{
-		terminal_set(
-			"window: size=80x25, cellsize=auto, title='Omni: menu';"
-			"font: default;"
-			"input: filter={keyboard}"
-		);
-		terminal_color("white");
-	};
-	
-	terminal_set("window: title='Omni: window resizing', resizeable=true, minimum-size=27x5");
+Engine::~Engine() {
+	terminal_close();
+};
 
-	const int symbol = 0x2588;
-
+void Engine::Run() {
 	while (true)
 	{
 		terminal_clear();
@@ -51,8 +52,12 @@ int main()
 			break;
 		}
 	}
+};
+
+int main()
+{
+   Engine engine;
+   engine.Run();
 	
-	terminal_close();
-	
-	return 0;
+   return 0;
 }

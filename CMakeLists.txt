@@ -20,12 +20,16 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake-modules)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # Add bearlibterminal
-find_library(bearlibterminal NAME BearLibTerminal
-                             PATHS lib/Linux32
-                                   lib/Linux64
-                                   lib/OSX
-                                   lib/Windows32
-                                   lib/Windows64 )
+if( CMAKE_SIZEOF_VOID_P EQUAL 8)
+    MESSAGE(STATUS "64 bit system detected.")
+    SET( EX_PLATFORM 64)
+    SET( LIB_PATHS lib/Linux64 lib/OSX lib/Windows64)
+else ()
+    MESSAGE(STATUS "32 bit system detected.")
+    SET( EX_PLATFORM 32)
+    SET( LIB_PATHS lib/Linux32 lib/OSX lib/Windows32)
+endif ()
+find_library(bearlibterminal NAME BearLibTerminal PATHS ${LIB_PATHS})
 message(STATUS "Found BearLibTerminal at: ${bearlibterminal}")
 
 # Make the project
