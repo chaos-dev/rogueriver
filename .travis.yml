@@ -27,6 +27,9 @@ matrix:
 before_script:
     - mkdir build
     - cd build
-    - cmake ..
+    - cmake .. -DCMAKE_INSTALL_PREFIX=./
 
 script: make
+
+after_success:
+    - cpack

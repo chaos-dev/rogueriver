@@ -2,8 +2,18 @@
 
 os: Visual Studio 2015
 
+platform:
+    - x86
+    - x64
+
 build_script:
     - md build
     - cd build
-    - cmake -G "Visual Studio 14 2015 Win64" ..
+    - cmake -G "Visual Studio 14 2015 Win64" -DCMAKE_INSTALL_PREFIX=./ ..
     - cmake --build . --config Release
+    
+after_build:
+    - cpack
+
+artifacts:
+  - path: 'RogueRiver.zip'

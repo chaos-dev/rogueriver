@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 # Manually specify C++14 for Travis CI
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
+set(CMAKE_USE_RELATIVE_PATHS True)
 
 # Our CMake Modules (For SDL2)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake-modules)
@@ -34,11 +35,19 @@ message(STATUS "Found BearLibTerminal at: ${bearlibterminal}")
 
 # Make the project
 add_subdirectory(${CMAKE_SOURCE_DIR}/src)
-file(COPY ${CMAKE_SOURCE_DIR}/graphics DESTINATION ${CMAKE_BINARY_DIR} )
+file(COPY ${CMAKE_SOURCE_DIR}/graphics DESTINATION ${CMAKE_BINARY_DIR})
 
 # Installation details
-install(FILES ${bearlibterminal} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install(DIRECTORY graphics DESTINATION ${CMAKE_INSTALL_PREFIX})
+FILE(GLOB assets ${CMAKE_SOURCE_DIR}/graphics/*.jpg)
+install(FILES ${bearlibterminal} DESTINATION ./)
+install(FILES ${assets}          DESTINATION graphics)
+
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_PACKAGE_NAME "RogueRiver")
+set(CPACK_PACKAGE_FILE_NAME "RogueRiver")
+set(CPACK_PACKAGE_VERSION_MAJOR ${RogueRiver_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${RogueRiver_VERSION_MINOR})
+include(CPack)
 
 
 
