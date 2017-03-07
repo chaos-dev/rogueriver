@@ -13,7 +13,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 FILE(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.c ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_executable(RogueRiver ${SOURCES})
-target_link_libraries(RogueRiver PUBLIC ${bearlibterminal})
+target_link_libraries(RogueRiver ${bearlibterminal})
 
 # Installation
 install(TARGETS RogueRiver DESTINATION bin)
