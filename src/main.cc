@@ -223,7 +223,7 @@ class Engine {
 Engine::Engine() {
 	terminal_open();
 	// Terminal settings
-	terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=80x24; font: ../graphics/VeraMono.ttf, size=16x16");
+	terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=80x24; font: graphics/VeraMono.ttf, size=16x16");
 	terminal_bkcolor(color_from_argb(255, BG_COLOR.r, BG_COLOR.g, BG_COLOR.b));
 	terminal_set("palette.sand = #a69d7b");
 	
