@@ -62,7 +62,7 @@ file(COPY ${CMAKE_SOURCE_DIR}/graphics DESTINATION ${CMAKE_BINARY_DIR})
 # ------------------------------------------------------------------------------
 # Installation details
 # ------------------------------------------------------------------------------
-FILE(GLOB assets ${CMAKE_SOURCE_DIR}/graphics/*.jpg)
+FILE(GLOB assets ${CMAKE_SOURCE_DIR}/graphics/*)
 install(FILES ${assets}          DESTINATION graphics)
 install(FILES ${bearlibterminal} DESTINATION lib)
 if (${CMAKE_CXX_COMPILER_ID} EQUAL "MSVC")
