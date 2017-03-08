@@ -68,8 +68,9 @@ install(FILES ${bearlibterminal} DESTINATION ./)
 if (${CMAKE_CXX_COMPILER_ID} EQUAL "MSVC")
     install(FILES lib/Windows${EX_PLATFORM}/BearLibTerminal.dll DESTINATION ./)
 endif ()
-set(${CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION} ${CMAKE_INSTALL_PREFIX})
+set(${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP} TRUE)
 include (InstallRequiredSystemLibraries)
+install (FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION ./)
 
 # ------------------------------------------------------------------------------
 # CPack

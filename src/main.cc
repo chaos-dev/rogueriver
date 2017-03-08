@@ -22,15 +22,6 @@
 
 #include "BearLibTerminal.h"
 
-struct Color {
-    int r, g, b;
-    Color(int r, int g, int b) : r(r), g(g), b(b) {};
-};
-
-Color RIVER_COLOR(4,69,143);
-Color BG_COLOR(91,135,20);
-Color BEACH_COLOR(166,157,12);
-
 class River {
  protected:
   int length;
@@ -183,17 +174,27 @@ bool Map::inBounds(int x, int y) const {
 }
 
 void Map::Render(Panel panel, Position* camera) const {
+  color_t water_color;
+  float vel;
   for (int term_x=panel.tl_corner.x; term_x < panel.br_corner.x; term_x++) {
     for (int term_y=panel.tl_corner.y; term_y < panel.br_corner.y; term_y++) {
       int game_x = term_x + camera->x - panel.width/2;
       int game_y = height - (term_y + height-camera->y - panel.height/2);
-        if (inBounds(game_x,game_y)) {
-          if (tiles[game_x + game_y*width].vel > 0) {
-            terminal_print(term_x, term_y, "[bkcolor=azure]~");
+      if (inBounds(game_x,game_y)) {
+          vel = tiles[game_x + game_y*width].vel;
+          if (vel > 0) {
+            water_color = color_from_name("water")*vel -
+                          color_from_name("beach")*(1.0 - vel);
+            terminal_print(term_x, term_y, "[bkcolor=water]~");
           } else if (river->isBeach(game_x, game_y)) {
-            terminal_print(term_x, term_y, "[bkcolor=sand].");
+            terminal_print(term_x, term_y, "[bkcolor=beach].");
+          } else {
+            terminal_print(term_x, term_y, "[bkcolor=bg] ");
           }
-        }
+      } else if (inBounds(game_x, 0)) {
+        // I set y to '0' so that the y direction is never empty
+        terminal_print(term_x, term_y, "[bkcolor=bg] ");
+      }
     }
   }
 };
@@ -224,8 +225,10 @@ Engine::Engine() {
 	terminal_open();
 	// Terminal settings
 	terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=80x24; font: graphics/VeraMono.ttf, size=16x16");
-	terminal_bkcolor(color_from_argb(255, BG_COLOR.r, BG_COLOR.g, BG_COLOR.b));
-	terminal_set("palette.sand = #a69d7b");
+	terminal_set("palette.beach = #a69d7b");
+	terminal_set("palette.bg    = #5b8714");
+	terminal_set("palette.water = #04458f");
+	terminal_bkcolor("black");
 	
 	// Initialize engine state
 	width = terminal_state(TK_WIDTH);
@@ -234,7 +237,7 @@ Engine::Engine() {
     
     // Initialize members
     map = new Map(MAP_WIDTH, MAP_HEIGHT);
-	map_panel.Update(0, 0, width-1, height-1);
+	map_panel.Update(0, 0, width, height);
 	camera = new Position(width/2, height/2);
     player = new Actor(width/2, height/2, (int)'@');
 };
@@ -273,7 +276,7 @@ void Engine::Render() {
 void Engine::Update() {
 	width = terminal_state(TK_WIDTH);
 	height = terminal_state(TK_HEIGHT);
-	map_panel.Update(0, 0, width-1, height-1);
+	map_panel.Update(0, 0, width, height);
 };
 
 void Engine::Run() {
