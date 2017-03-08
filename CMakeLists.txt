@@ -64,15 +64,16 @@ file(COPY ${CMAKE_SOURCE_DIR}/graphics DESTINATION ${CMAKE_BINARY_DIR})
 # ------------------------------------------------------------------------------
 FILE(GLOB assets ${CMAKE_SOURCE_DIR}/graphics/*)
 install(FILES ${assets}          DESTINATION graphics)
-install(FILES ${bearlibterminal} DESTINATION lib)
+install(FILES ${bearlibterminal} DESTINATION ./)
 if (${CMAKE_CXX_COMPILER_ID} EQUAL "MSVC")
-    install(FILES lib/Windows${EX_PLATFORM}/BearLibTerminal.dll DESTINATION lib)
+    install(FILES lib/Windows${EX_PLATFORM}/BearLibTerminal.dll DESTINATION ./)
 endif ()
+set(${CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION} ${CMAKE_INSTALL_PREFIX})
+include (InstallRequiredSystemLibraries)
 
 # ------------------------------------------------------------------------------
 # CPack
 # ------------------------------------------------------------------------------
-include (InstallRequiredSystemLibraries)
 if (${WIN32})
     set(CPACK_GENERATOR "ZIP")
 else ()
