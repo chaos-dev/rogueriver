@@ -103,7 +103,7 @@ void MonsterAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 }
 
 
-PlayerAi::PlayerAi() : dx(0), dy(0), move(false){
+PlayerAi::PlayerAi() : dx(0), dy(0), move(false), running(false){
 }
 
 /** Checks to see if the player should be considered for effects, etc.
@@ -149,7 +149,7 @@ void PlayerAi::ProcessInput(Actor *owner, int key, bool shift) {
   } else if (key == TK_RIGHT || key == TK_KP_6 || (key == TK_L && !shift)) {
     dx = 1; move = true;
   } else if (key == TK_KP_1 || (key == TK_B && !shift)) {
-    dx = -1; dy = 1; move = true;
+    dx = -1; dy = -1; move = true;
   } else if (key == TK_KP_3 || (key == TK_N && !shift)){
     dx = 1; dy = -1; move = true;
   } else if (key == TK_KP_7 || (key == TK_Y && !shift)){
@@ -158,6 +158,16 @@ void PlayerAi::ProcessInput(Actor *owner, int key, bool shift) {
     dx = 1; dy = 1; move = true;
   } else if (key == TK_KP_5 || (key == TK_PERIOD && !shift)) {
     dx = 0; dy = 0; move = true;
+  } else if (key == TK_R && !shift) {
+    if (running) {
+      running = false;
+    } else {
+      running = true;
+    }
+  }
+  if (running) {
+    dx *= 2;
+    dy *= 2;
   }
 }
 
