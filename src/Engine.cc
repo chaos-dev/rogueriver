@@ -25,7 +25,7 @@ Engine::Engine() {
   // Terminal settings
   terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=80x24");
   terminal_set("font: graphics/VeraMono.ttf, size=8x16");
-  //terminal_set("tile font: graphics/Anikki_square_16x16.bmp, size=16x16, align=top-left");
+  terminal_set("tile font: graphics/Anikki_square_16x16.bmp, size=16x16, align=top-left");
   terminal_bkcolor("black");
 
   // Initialize engine state
@@ -82,26 +82,25 @@ void Engine::Render() {
   terminal_clear();
   
   // Map
-  //terminal_layer(0);
+  terminal_layer(0);
   map->Render(map_panel, camera);
   
   // Actors
-  //terminal_layer(1);
+  terminal_layer(1);
   RenderActor(player);
   
   // Gui
-  //terminal_layer(2);
+  terminal_layer(2);
   terminal_print(width-SIDEBAR_WIDTH+1, 1, "River: Acheron");
   terminal_printf(width-SIDEBAR_WIDTH+1, 3, "X: %d  Y: %d", player->x, player->y);
   terminal_refresh();
 };
 
 void Engine::RenderActor(Actor* actor) {
-  //const char* symbol = (char*)actor->symbol;
   int term_x = (actor->x - camera->x)*2 + map_panel.width/2;
   int term_y = actor->y - camera->y + map_panel.height/2;
   terminal_bkcolor(terminal_pick_color(term_x, term_y, 0));
-  terminal_print(term_x, term_y, "@");
+  terminal_print(term_x, term_y, "[font=tile]@");
   terminal_bkcolor(color_from_name("black"));
 };
 
