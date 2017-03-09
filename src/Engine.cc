@@ -97,11 +97,11 @@ void Engine::Render() {
 };
 
 void Engine::RenderActor(Actor* actor) {
-  const char* symbol = (char*)actor->symbol;
+  //const char* symbol = (char*)actor->symbol;
   int term_x = (actor->x - camera->x)*2 + map_panel.width/2;
   int term_y = actor->y - camera->y + map_panel.height/2;
   terminal_bkcolor(terminal_pick_color(term_x, term_y, 0));
-  terminal_printf(term_x, term_y, "%s", symbol);
+  terminal_print(term_x, term_y, "@");
   terminal_bkcolor(color_from_name("black"));
 };
 
