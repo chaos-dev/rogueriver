@@ -82,15 +82,15 @@ void Engine::Render() {
   terminal_clear();
   
   // Map
-  terminal_layer(0);
+  //terminal_layer(0);
   map->Render(map_panel, camera);
   
   // Actors
-  terminal_layer(1);
+  //terminal_layer(1);
   RenderActor(player);
   
   // Gui
-  terminal_layer(2);
+  //terminal_layer(2);
   terminal_print(width-SIDEBAR_WIDTH+1, 1, "River: Acheron");
   terminal_printf(width-SIDEBAR_WIDTH+1, 3, "X: %d  Y: %d", player->x, player->y);
   terminal_refresh();
