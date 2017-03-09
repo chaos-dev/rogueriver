@@ -21,6 +21,9 @@
 #define INCLUDE_MAP_H_
 
 #include "River.h"
+#include "Color.h"
+
+#include "BearLibTerminal.h"
 
 struct Position {
     int x, y;
@@ -46,11 +49,13 @@ struct Panel {
 struct Tile {
     bool canWalk;
     float vel;
+    Color color;
     Tile() : canWalk(true), vel(0.0) {};
 };
 
 class Map {
  protected:
+  Color beach_color, water_color, bg_color;
   std::vector<Tile> tiles;
   void SetWall(int x, int y);
   bool inBounds(int x, int y) const;

@@ -24,9 +24,6 @@ Engine::Engine() {
   terminal_open();
   // Terminal settings
   terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=80x24; font: graphics/VeraMono.ttf, size=16x16");
-  terminal_set("palette.beach = #a69d7b");
-  terminal_set("palette.bg    = #5b8714");
-  terminal_set("palette.water = #04458f");
   terminal_bkcolor("black");
 
   // Initialize engine state

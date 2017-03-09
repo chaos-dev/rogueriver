@@ -19,13 +19,24 @@
 #include "Map.h"
 
 #include "BearLibTerminal.h"
+#include "Color.h"
 
-Map::Map(int width, int height) : width(width), height(height) {
+Map::Map(int width, int height)
+    : width(width), height(height), 
+      water_color(4,69,143), beach_color(166,157, 123), bg_color(91,135,20) {
   tiles.resize(height*width);
   river = new River(width);
   for (int x=0; x<width; x++) {
     for (int y=0; y<height; y++) {
-     tiles[x+y*width].vel = river->GetVelocity(x,y);
+      float vel = river->GetVelocity(x,y);
+      tiles[x + y*width].vel = vel;
+      if (vel > 0) {
+        tiles[x + y*width].color = water_color*vel + beach_color*(1.0-vel);
+      } else if (river->isBeach(x, y)) {
+        tiles[x + y*width].color = beach_color;
+      } else {
+        tiles[x + y*width].color = bg_color;
+      }
     }
   }
 };
@@ -47,26 +58,15 @@ bool Map::inBounds(int x, int y) const {
 }
 
 void Map::Render(Panel panel, Position* camera) const {
-  color_t water_color;
-  float vel;
+  color_t corner_colors[4];
   for (int term_x=panel.tl_corner.x; term_x < panel.br_corner.x; term_x++) {
     for (int term_y=panel.tl_corner.y; term_y < panel.br_corner.y; term_y++) {
       int game_x = term_x + camera->x - panel.width/2;
       int game_y = height - (term_y + height-camera->y - panel.height/2);
-      if (inBounds(game_x,game_y)) {
-          vel = tiles[game_x + game_y*width].vel;
-          if (vel > 0) {
-            water_color = color_from_name("water")*vel -
-                          color_from_name("beach")*(1.0 - vel);
-            terminal_print(term_x, term_y, "[bkcolor=water]~");
-          } else if (river->isBeach(game_x, game_y)) {
-            terminal_print(term_x, term_y, "[bkcolor=beach].");
-          } else {
-            terminal_print(term_x, term_y, "[bkcolor=bg] ");
-          }
-      } else if (inBounds(game_x, 0)) {
-        // I set y to '0' so that the y direction is never empty
-        terminal_print(term_x, term_y, "[bkcolor=bg] ");
+      if (inBounds(game_x, game_y)) {
+        for (int corner = 0; corner<4; corner++) {
+          corner_colors[corner] = tiles[game_x + game_y*width].color.Convert();
+        terminal_put_ext(term_x, term_y, 0, 0, 0x2588, corner_colors);
       }
     }
   }
