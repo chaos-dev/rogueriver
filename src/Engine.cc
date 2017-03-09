@@ -97,6 +97,9 @@ void Engine::RenderActor(Actor* actor) {
 };
 
 void Engine::Update() {
+  // Update the actos
+  player->Update();
+  // Update the map
   width = terminal_state(TK_WIDTH);
   height = terminal_state(TK_HEIGHT);
   map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);

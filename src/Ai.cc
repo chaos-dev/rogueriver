@@ -130,40 +130,35 @@ void PlayerAi::Update(Actor *owner) {
   //  return;
   //}
 
-  //Process any keystrokes
-//  int dx=0,dy=0;
-//
-//  if (dx != 0 || dy != 0) {
-//    engine.gameStatus=Engine::NEW_TURN;
-//    if (moveOrAttack(owner, owner->x+dx,owner->y+dy)) {
-//      engine.map->computeFov();
-//    }
-//  }
+  //Process any movement
+  if (move == true) {
+    moveOrAttack(owner, owner->x+dx,owner->y+dy);
+    engine.camera->x = owner->x; engine.camera->y = owner->y;
+    dx = 0; dy = 0;
+    move = false;
+  }
 }
 
 void PlayerAi::ProcessInput(Actor *owner, int key, bool shift) {
   if (key == TK_UP || key == TK_KP_8 || (key == TK_K && !shift)) {
-    owner->y += 1;
+    dy = 1; move = true;
   } else if (key == TK_DOWN || key == TK_KP_2 || (key == TK_J && !shift)) {
-    owner->y -= 1;
+    dy = -1; move = true;
   } else if (key == TK_LEFT || key == TK_KP_4 || (key == TK_H && !shift)) {
-    owner->x -= 1;
+    dx = -1; move = true;
   } else if (key == TK_RIGHT || key == TK_KP_6 || (key == TK_L && !shift)) {
-    owner->x += 1;
+    dx = 1; move = true;
   } else if (key == TK_KP_1 || (key == TK_B && !shift)) {
-    owner->x -= 1;
-    owner->y -= 1;
+    dx = -1; dy = 1; move = true;
   } else if (key == TK_KP_3 || (key == TK_N && !shift)){
-    owner->x += 1;
-    owner->y -= 1;
+    dx = 1; dy = -1; move = true;
   } else if (key == TK_KP_7 || (key == TK_Y && !shift)){
-    owner->x -= 1;
-    owner->y += 1;
+    dx = -1; dy = 1; move = true;
   } else if (key == TK_KP_9 || (key == TK_U && !shift)){
-    owner->x += 1;
-    owner->y += 1;
+    dx = 1; dy = 1; move = true;
+  } else if (key == TK_KP_5 || (key == TK_PERIOD && !shift)) {
+    dx = 0; dy = 0; move = true;
   }
-  engine.camera->x = owner->x; engine.camera->y = owner->y;
 }
 
 /** This function handles the movement and "bump to attack" actions.
@@ -177,10 +172,16 @@ void PlayerAi::ProcessInput(Actor *owner, int key, bool shift) {
 bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
 
   if ( engine.map->isWall(targetx,targety) ) return false;
-  
-  //FIXME: Add in river velocity
-
-  owner->x=targetx;
-  owner->y=targety;
+  // I cheat a little here to give the player a favorable rounding
+  if (owner->x == targetx) {
+    owner->x=targetx + std::round(engine.map->GetUVelocity(owner->x, owner->y));
+  } else {
+    owner->x=targetx + std::trunc(engine.map->GetUVelocity(owner->x, owner->y));
+  }
+  if (owner->y == targety) {
+    owner->y=targety + std::round(engine.map->GetVVelocity(owner->x, owner->y));
+  } else {
+    owner->y=targety + std::trunc(engine.map->GetVVelocity(owner->x, owner->y));
+  }
   return true;
 }
