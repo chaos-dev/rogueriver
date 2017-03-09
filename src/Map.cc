@@ -18,6 +18,8 @@
 
 #include "Map.h"
 
+#include <cmath>
+
 #include "BearLibTerminal.h"
 #include "Color.h"
 
@@ -30,8 +32,11 @@ Map::Map(int width, int height)
     for (int y=0; y<height; y++) {
       float vel = river->GetVelocity(x,y);
       tiles[x + y*width].vel = vel;
+      tiles[x + y*width].u = vel*std::cos(river->angle[x]);
+      tiles[x + y*width].v = vel*std::sin(river->angle[x]);
       if (vel > 0) {
-        tiles[x + y*width].color = water_color*vel + beach_color*(1.0-vel);
+        tiles[x + y*width].color = water_color*(vel/river->max_velocity) + 
+                                   beach_color*(1.0-(vel/river->max_velocity));
       } else if (river->isBeach(x, y)) {
         tiles[x + y*width].color = beach_color;
       } else {
@@ -72,4 +77,25 @@ void Map::Render(Panel panel, Position* camera) const {
   }
 };
 
+Position Map::GetPlayerStart() {
+    Position position;
+    position.x = 50;
+    position.y = river->GetPlayerStart(50);
+    return position;
+};
 
+float Map::GetUVelocity(int x, int y) {
+    if (inBounds(x,y)) {
+        return tiles[x+y*width].u;
+    } else {
+        return 0.0;
+    };
+};
+
+float Map::GetVVelocity(int x, int y) {
+    if (inBounds(x,y)) {
+        return tiles[x+y*width].v;
+    } else {
+        return 0.0;
+    };
+};

@@ -32,6 +32,7 @@ class Engine {
   Map* map;
   Panel map_panel;
   Position* camera;
+  Position* mouse;
   const int symbol = 0x2588;
   enum Status {OPEN,
                CLOSED} status;

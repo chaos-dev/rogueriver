@@ -25,19 +25,22 @@ Engine::Engine() {
   // Terminal settings
   terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=80x24");
   terminal_set("font: graphics/VeraMono.ttf, size=8x16");
-  terminal_set("tile font: graphics/Anikki_square_16x16.bmp, size=16x16, align=top-left");
+  terminal_set("tile font: graphics/Anikki_square_16x16.bmp, size=16x16, codepage=437, align=top-left");
+  terminal_set("input.filter={keyboard, mouse+}");
   terminal_bkcolor("black");
 
   // Initialize engine state
   width = terminal_state(TK_WIDTH);
   height = terminal_state(TK_HEIGHT);
   status = OPEN;
+  mouse = new Position(terminal_state(TK_MOUSE_X), terminal_state(TK_MOUSE_Y));
 
   // Initialize members
   map = new Map(MAP_WIDTH, MAP_HEIGHT);
   map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
-  camera = new Position(width/2, height/2);
-  player = new Actor(width/2, height/2, (int)"@");
+  Position player_start = map->GetPlayerStart();
+  camera = new Position(player_start.x, player_start.y);
+  player = new Actor(player_start.x, player_start.y, (int)'@');
 };
 
 Engine::~Engine() {
@@ -74,6 +77,9 @@ void Engine::ProcessInput() {
       } else if (key == TK_KP_9 || (key == TK_U && !terminal_check(TK_SHIFT))){
           camera->x += 1; player->x += 1;
           camera->y += 1; player->y += 1;
+      } else if (key == TK_MOUSE_MOVE) {
+        mouse->x = terminal_state(TK_MOUSE_X)/2 + camera->x - map_panel.width/4;
+        mouse->y = -terminal_state(TK_MOUSE_Y) + camera->y + map_panel.height/2;
       }
   }
 };
@@ -92,7 +98,12 @@ void Engine::Render() {
   // Gui
   terminal_layer(2);
   terminal_print(width-SIDEBAR_WIDTH+1, 1, "River: Acheron");
-  terminal_printf(width-SIDEBAR_WIDTH+1, 3, "X: %d  Y: %d", player->x, player->y);
+  terminal_printf(width-SIDEBAR_WIDTH+1, 3, "Player X: %d  Y: %d", player->x, player->y);
+  terminal_printf(width-SIDEBAR_WIDTH+1, 5, "Cursor X: %d  Y: %d", mouse->x, mouse->y);
+  terminal_printf(width-SIDEBAR_WIDTH+1, 7, "River Velocity Under Cursor:");
+  terminal_printf(width-SIDEBAR_WIDTH+1, 8, "    [[%.1f, %.1f]] m/s", 
+                  map->GetUVelocity(mouse->x, mouse->y),
+                  map->GetVVelocity(mouse->x, mouse->y));
   terminal_refresh();
 };
 
@@ -100,7 +111,7 @@ void Engine::RenderActor(Actor* actor) {
   int term_x = (actor->x - camera->x)*2 + map_panel.width/2;
   int term_y = actor->y - camera->y + map_panel.height/2;
   terminal_bkcolor(terminal_pick_color(term_x, term_y, 0));
-  terminal_print(term_x, term_y, "[font=tile]@");
+  terminal_printf(term_x, term_y, "[font=tile]%c", (char*)actor->symbol);
   terminal_bkcolor(color_from_name("black"));
 };
 

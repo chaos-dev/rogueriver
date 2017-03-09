@@ -18,14 +18,36 @@
 
 #include "River.h"
 
+#include <cmath>
+
 River::River(int length) : length(length) {
   width.resize(length);
   shape.resize(length);
+  angle.resize(length);
+  mean_velocity.resize(length);
   rng.seed(std::random_device()());
 
   // Create the river
   width = RandomSignal(length, min_width, max_width, length/2.0, length*2.0, num_periods);
   shape = RandomSignal(length, min_travel, max_travel, length/3.0, length*2.0, num_periods);
+  
+  // Create the angle of the river
+  angle[0] = std::tan(shape[1] - shape[0]);
+  for (int i=0; i<length-1; i++) {
+    angle[i] = std::tan((shape[i+1] - shape[i-1])/2);
+  };
+  angle[length-1] = std::tan(shape[length-1] - shape[length-2]);
+  
+  // Create the speed of the river
+  max_velocity = 0.0;
+  float C = 2.00;    // constant on curve fit
+  float p = -0.395;  // power on curve fit
+  float Q = 40;      // m^3/s volumetric flowrate
+  for (int i=0; i<length; i++) {
+    mean_velocity[i] = C*std::pow(width[i]/Q, p);
+    if (1.5*mean_velocity[i] > max_velocity)
+        max_velocity = 1.5*mean_velocity[i];
+  };
 };
 
 std::vector<float> River::RandomSignal(int n, float y_min, float y_max,
@@ -56,10 +78,10 @@ std::vector<float> River::RandomSignal(int n, float y_min, float y_max,
 }
 
 float River::GetVelocity(int x, int y) {
-  int i = (int)x;
-  float rescaled = (y - shape[i])/(width[i]/2.0);
+  float rescaled = (y - shape[x])/(width[x]/2.0);
+  float peak_velocity = 1.5*mean_velocity[x];
   if (rescaled < 1.0 && rescaled > -1.0) {
-    return 1.0 - rescaled*rescaled;
+    return (1.0 - rescaled*rescaled)*peak_velocity;
   } else {
     return 0.0;
   }
@@ -73,6 +95,10 @@ bool River::isBeach(int x, int y) {
   } else {
     return false;
   }
+};
+
+int River::GetPlayerStart(int x) {
+    return shape[x] + width[x]/2 + 2;
 };
 
 

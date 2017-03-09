@@ -48,7 +48,7 @@ struct Panel {
 
 struct Tile {
     bool canWalk;
-    float vel;
+    float vel, u, v;
     Color color;
     Tile() : canWalk(true), vel(0.0) {};
 };
@@ -66,6 +66,9 @@ class Map {
 
   Map(int width, int height);
   bool isWall(int x, int y) const;
+  Position GetPlayerStart();
+  float GetUVelocity(int x, int y);
+  float GetVVelocity(int x, int y);
   void Render(Panel panel, Position* camera) const;
 };
 

@@ -34,13 +34,17 @@ class River {
   int num_periods = 3;
   std::vector<float> width;
   std::vector<float> shape;
+  std::vector<float> mean_velocity;
   std::mt19937 rng;
 
   std::vector<float> RandomSignal(int n, float y_min, float y_max, float min_period, float max_period, int num_periods);
  public:
   River(int length);
+  std::vector<float> angle;
   float GetVelocity(int x, int y);
   bool isBeach(int x, int y);
+  int GetPlayerStart(int x);
+  float max_velocity;
 };
 
 #endif /* INCLUDE_RIVER_H_ */
