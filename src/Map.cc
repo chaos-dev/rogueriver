@@ -58,7 +58,6 @@ bool Map::inBounds(int x, int y) const {
 }
 
 void Map::Render(Panel panel, Position* camera) const {
-  
   color_t corner_colors[4];
   for (int term_x=panel.tl_corner.x; term_x < panel.br_corner.x; term_x++) {
     for (int term_y=panel.tl_corner.y; term_y < panel.br_corner.y; term_y++) {
