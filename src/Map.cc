@@ -58,13 +58,14 @@ bool Map::inBounds(int x, int y) const {
 }
 
 void Map::Render(Panel panel, Position* camera) const {
+  
   color_t corner_colors[4];
   for (int term_x=panel.tl_corner.x; term_x < panel.br_corner.x; term_x++) {
     for (int term_y=panel.tl_corner.y; term_y < panel.br_corner.y; term_y++) {
-      int game_x = term_x + camera->x - panel.width/2;
+      int game_x = term_x/2 + camera->x - panel.width/4;
       int game_y = height - (term_y + height-camera->y - panel.height/2);
       if (inBounds(game_x, game_y)) {
-        for (int corner = 0; corner<4; corner++) {
+        for (int corner = 0; corner<4; corner++)
           corner_colors[corner] = tiles[game_x + game_y*width].color.Convert();
         terminal_put_ext(term_x, term_y, 0, 0, 0x2588, corner_colors);
       }

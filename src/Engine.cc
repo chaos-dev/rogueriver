@@ -23,19 +23,21 @@
 Engine::Engine() {
   terminal_open();
   // Terminal settings
-  terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=80x24; font: graphics/VeraMono.ttf, size=16x16");
+  terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=80x24");
+  terminal_set("font: graphics/VeraMono.ttf, size=8x16");
+  terminal_set("tile font: graphics/Anikki_square_16x16.bmp, size=16x16, align=top-left");
   terminal_bkcolor("black");
 
   // Initialize engine state
   width = terminal_state(TK_WIDTH);
-    height = terminal_state(TK_HEIGHT);
-    status = OPEN;
+  height = terminal_state(TK_HEIGHT);
+  status = OPEN;
 
-    // Initialize members
-    map = new Map(MAP_WIDTH, MAP_HEIGHT);
-  map_panel.Update(0, 0, width, height);
+  // Initialize members
+  map = new Map(MAP_WIDTH, MAP_HEIGHT);
+  map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
   camera = new Position(width/2, height/2);
-    player = new Actor(width/2, height/2, (int)'@');
+  player = new Actor(width/2, height/2, (int)"@");
 };
 
 Engine::~Engine() {
@@ -48,31 +50,65 @@ void Engine::ProcessInput() {
 
       if (key == TK_CLOSE || key == TK_ESCAPE) {
         status = CLOSED;
-      } else if (key == TK_UP) {
+      } else if (key == TK_UP || key == TK_KP_8 
+                 || (key == TK_K && !terminal_check(TK_SHIFT))) {
           camera->y += 1; player->y += 1;
-      } else if (key == TK_DOWN) {
+      } else if (key == TK_DOWN || key == TK_KP_2 
+                 || (key == TK_J && !terminal_check(TK_SHIFT))) {
           camera->y -= 1; player->y -= 1;
-      } else if (key == TK_LEFT) {
+      } else if (key == TK_LEFT || key == TK_KP_4 
+                 || (key == TK_H && !terminal_check(TK_SHIFT))) {
           camera->x -= 1; player->x -= 1;
-      } else if (key == TK_RIGHT) {
+      } else if (key == TK_RIGHT || key == TK_KP_6 
+                 || (key == TK_L && !terminal_check(TK_SHIFT))) {
           camera->x += 1; player->x += 1;
+      } else if (key == TK_KP_1 || (key == TK_B && !terminal_check(TK_SHIFT))){
+          camera->x -= 1; player->x -= 1;
+          camera->y -= 1; player->y -= 1;
+      } else if (key == TK_KP_3 || (key == TK_N && !terminal_check(TK_SHIFT))){
+          camera->x += 1; player->x += 1;
+          camera->y -= 1; player->y -= 1;
+      } else if (key == TK_KP_7 || (key == TK_Y && !terminal_check(TK_SHIFT))){
+          camera->x -= 1; player->x -= 1;
+          camera->y += 1; player->y += 1;
+      } else if (key == TK_KP_9 || (key == TK_U && !terminal_check(TK_SHIFT))){
+          camera->x += 1; player->x += 1;
+          camera->y += 1; player->y += 1;
       }
   }
 };
 
 void Engine::Render() {
   terminal_clear();
+  
+  // Map
+  terminal_layer(0);
   map->Render(map_panel, camera);
-  terminal_put(player->x - camera->x + map_panel.width/2,
-               player->y - camera->y + map_panel.height/2, player->symbol);
-  terminal_printf(map_panel.width/2-5, 0, "X: %d  Y: %d", player->x, player->y);
+  
+  // Actors
+  terminal_layer(1);
+  RenderActor(player);
+  
+  // Gui
+  terminal_layer(2);
+  terminal_print(width-SIDEBAR_WIDTH+1, 1, "River: Acheron");
+  terminal_printf(width-SIDEBAR_WIDTH+1, 3, "X: %d  Y: %d", player->x, player->y);
   terminal_refresh();
+};
+
+void Engine::RenderActor(Actor* actor) {
+  const char* symbol = (char*)actor->symbol;
+  int term_x = (actor->x - camera->x)*2 + map_panel.width/2;
+  int term_y = actor->y - camera->y + map_panel.height/2;
+  terminal_bkcolor(terminal_pick_color(term_x, term_y, 0));
+  terminal_printf(term_x, term_y, "[font=tile]%s", symbol);
+  terminal_bkcolor(color_from_name("black"));
 };
 
 void Engine::Update() {
   width = terminal_state(TK_WIDTH);
   height = terminal_state(TK_HEIGHT);
-  map_panel.Update(0, 0, width, height);
+  map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
 };
 
 void Engine::Run() {

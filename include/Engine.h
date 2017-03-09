@@ -27,6 +27,7 @@ class Engine {
  protected:
   const int MAP_WIDTH = 500;
   const int MAP_HEIGHT = 120;
+  const int SIDEBAR_WIDTH = 40;
   int width, height;
   Map* map;
   Panel map_panel;
@@ -39,6 +40,7 @@ class Engine {
   void ProcessInput();
   void Update();
   void Render();
+  void RenderActor(Actor* actor);
  public:
   Engine();
   ~Engine();
