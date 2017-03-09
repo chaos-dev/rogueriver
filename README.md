@@ -1,5 +1,8 @@
 # Rogue River: Obol of Charon
-A roguelike where you boat down the 5 rivers of the Greek Underworld and battle mythical monsters.
+Explore five procedurally generated rivers as you fight to reclaim your
+loved one from the Greek Underworld.
+
+![screenshot](Screenshot.png?raw=true)
 
 **Linux/OSX**: [![Build Status](https://travis-ci.org/chaos-dev/rogueriver.svg)](https://travis-ci.org/chaos-dev/rogueriver)
 
