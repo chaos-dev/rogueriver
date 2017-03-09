@@ -19,9 +19,9 @@
 
 #include "Engine.h"
 
-int main()
-{
-   Engine engine;
+Engine engine;
+
+int main() {
    engine.Run();
 	
    return 0;

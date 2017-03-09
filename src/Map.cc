@@ -77,14 +77,14 @@ void Map::Render(Panel panel, Position* camera) const {
   }
 };
 
-Position Map::GetPlayerStart() {
+Position Map::GetPlayerStart() const {
     Position position;
     position.x = 50;
     position.y = river->GetPlayerStart(50);
     return position;
 };
 
-float Map::GetUVelocity(int x, int y) {
+float Map::GetUVelocity(int x, int y) const {
     if (inBounds(x,y)) {
         return tiles[x+y*width].u;
     } else {
@@ -92,10 +92,26 @@ float Map::GetUVelocity(int x, int y) {
     };
 };
 
-float Map::GetVVelocity(int x, int y) {
+float Map::GetVVelocity(int x, int y) const{
     if (inBounds(x,y)) {
         return tiles[x+y*width].v;
     } else {
         return 0.0;
     };
 };
+
+bool Map::CanWalk(int x, int y) const {
+  if (isWall(x,y)) {
+    // this is a wall
+    return false;
+  }
+//  for (Actor **iterator=engine.actors.begin();
+//      iterator!=engine.actors.end();iterator++) {
+//    Actor *actor=*iterator;
+//    if ( actor->blocks && actor->x == x && actor->y == y ) {
+//      // there is a blocking actor here. cannot walk
+//      return false;
+//    }
+//  }
+  return true;
+}

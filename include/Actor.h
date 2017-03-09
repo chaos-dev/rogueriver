@@ -20,11 +20,22 @@
 #ifndef INCLUDE_ACTOR_H_
 #define INCLUDE_ACTOR_H_
 
+class Actor;
+#include "Ai.h"
+
 class Actor {
+ private:
+  float GetDistance(int cx, int cy) const;
  public:
   int x, y;
   int symbol;
-  Actor(int x, int y, int symbol) : x(x), y(y), symbol(symbol) {};
+  const char* name;
+  bool blocks;
+  Ai* ai;
+  Actor(int x, int y, int symbol, const char* name);
+  ~Actor();
+  void Update();
+  void ProcessInput(int key, bool shift);
 };
 
 #endif /* INCLUDE_ACTOR_H_ */

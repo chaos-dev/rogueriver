@@ -66,9 +66,10 @@ class Map {
 
   Map(int width, int height);
   bool isWall(int x, int y) const;
-  Position GetPlayerStart();
-  float GetUVelocity(int x, int y);
-  float GetVVelocity(int x, int y);
+  Position GetPlayerStart() const;
+  float GetUVelocity(int x, int y) const;
+  float GetVVelocity(int x, int y) const;
+  bool CanWalk(int x, int y) const;
   void Render(Panel panel, Position* camera) const;
 };
 

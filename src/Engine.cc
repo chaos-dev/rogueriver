@@ -18,6 +18,9 @@
 
 #include "Engine.h"
 
+#include "Actor.h"
+#include "Ai.h"
+
 #include "BearLibTerminal.h"
 
 Engine::Engine() {
@@ -40,7 +43,8 @@ Engine::Engine() {
   map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
   Position player_start = map->GetPlayerStart();
   camera = new Position(player_start.x, player_start.y);
-  player = new Actor(player_start.x, player_start.y, (int)'@');
+  player = new Actor(player_start.x, player_start.y, (int)'@', "player");
+  player->ai = new PlayerAi();
 };
 
 Engine::~Engine() {
@@ -50,33 +54,10 @@ Engine::~Engine() {
 void Engine::ProcessInput() {
     while (terminal_has_input()) {
       int key = terminal_read();
-
+      bool shift = terminal_check(TK_SHIFT);
+      player->ProcessInput(key, shift);
       if (key == TK_CLOSE || key == TK_ESCAPE) {
         status = CLOSED;
-      } else if (key == TK_UP || key == TK_KP_8 
-                 || (key == TK_K && !terminal_check(TK_SHIFT))) {
-          camera->y += 1; player->y += 1;
-      } else if (key == TK_DOWN || key == TK_KP_2 
-                 || (key == TK_J && !terminal_check(TK_SHIFT))) {
-          camera->y -= 1; player->y -= 1;
-      } else if (key == TK_LEFT || key == TK_KP_4 
-                 || (key == TK_H && !terminal_check(TK_SHIFT))) {
-          camera->x -= 1; player->x -= 1;
-      } else if (key == TK_RIGHT || key == TK_KP_6 
-                 || (key == TK_L && !terminal_check(TK_SHIFT))) {
-          camera->x += 1; player->x += 1;
-      } else if (key == TK_KP_1 || (key == TK_B && !terminal_check(TK_SHIFT))){
-          camera->x -= 1; player->x -= 1;
-          camera->y -= 1; player->y -= 1;
-      } else if (key == TK_KP_3 || (key == TK_N && !terminal_check(TK_SHIFT))){
-          camera->x += 1; player->x += 1;
-          camera->y -= 1; player->y -= 1;
-      } else if (key == TK_KP_7 || (key == TK_Y && !terminal_check(TK_SHIFT))){
-          camera->x -= 1; player->x -= 1;
-          camera->y += 1; player->y += 1;
-      } else if (key == TK_KP_9 || (key == TK_U && !terminal_check(TK_SHIFT))){
-          camera->x += 1; player->x += 1;
-          camera->y += 1; player->y += 1;
       } else if (key == TK_MOUSE_MOVE) {
         mouse->x = terminal_state(TK_MOUSE_X)/2 + camera->x - map_panel.width/4;
         mouse->y = -terminal_state(TK_MOUSE_Y) + camera->y + map_panel.height/2;

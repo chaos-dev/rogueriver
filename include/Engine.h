@@ -22,6 +22,7 @@
 
 #include "Map.h"
 #include "Actor.h"
+#include "Ai.h"
 
 class Engine {
  protected:
@@ -29,25 +30,27 @@ class Engine {
   const int MAP_HEIGHT = 120;
   const int SIDEBAR_WIDTH = 40;
   int width, height;
-  Map* map;
   Panel map_panel;
-  Position* camera;
   Position* mouse;
   const int symbol = 0x2588;
   enum Status {OPEN,
                CLOSED} status;
-  Actor* player;
 
   void ProcessInput();
   void Update();
   void Render();
   void RenderActor(Actor* actor);
+
  public:
+  Actor* player;
+  Map* map;
+  Position* camera;
+
   Engine();
   ~Engine();
   void Run();
 };
 
-
+extern Engine engine;
 
 #endif /* INCLUDE_ENGINE_H_ */
