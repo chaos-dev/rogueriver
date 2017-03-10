@@ -23,6 +23,7 @@
 #include "Map.h"
 #include "Actor.h"
 #include "Ai.h"
+#include "Gui.h"
 
 class Engine {
  protected:
@@ -45,6 +46,7 @@ class Engine {
   Actor* player;
   Map* map;
   Position* camera;
+  Gui* gui;
 
   Engine();
   ~Engine();

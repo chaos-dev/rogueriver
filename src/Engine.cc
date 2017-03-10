@@ -29,7 +29,7 @@ Engine::Engine() {
   terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=80x24");
   terminal_set("font: graphics/VeraMono.ttf, size=8x16");
   terminal_set("tile font: graphics/Anikki_square_16x16.bmp, size=16x16, codepage=437, align=top-left");
-  terminal_set("input.filter={keyboard, mouse+}");
+  terminal_set("input.filter={keyboard, mouse+}, precise-mouse=true");
   terminal_bkcolor("black");
 
   // Initialize engine state
@@ -39,6 +39,7 @@ Engine::Engine() {
   mouse = new Position(terminal_state(TK_MOUSE_X), terminal_state(TK_MOUSE_Y));
 
   // Initialize members
+  gui = new Gui(SIDEBAR_WIDTH);
   map = new Map(MAP_WIDTH, MAP_HEIGHT);
   map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
   Position player_start = map->GetPlayerStart();
@@ -56,6 +57,7 @@ void Engine::ProcessInput() {
       int key = terminal_read();
       bool shift = terminal_check(TK_SHIFT);
       player->ProcessInput(key, shift);
+      gui->ProcessInput(key);
       if (key == TK_CLOSE || key == TK_ESCAPE) {
         status = CLOSED;
       } else if (key == TK_MOUSE_MOVE) {
@@ -82,10 +84,14 @@ void Engine::Render() {
   terminal_printf(width-SIDEBAR_WIDTH+1, 3, "Player X: %d  Y: %d", player->x, player->y);
   terminal_printf(width-SIDEBAR_WIDTH+1, 5, "Cursor X: %d  Y: %d", mouse->x, mouse->y);
   terminal_printf(width-SIDEBAR_WIDTH+1, 7, "River Velocity Under Cursor:");
-  terminal_printf(width-SIDEBAR_WIDTH+1, 8, "    [[%.1f, %.1f]] m/s", 
+  terminal_printf(width-SIDEBAR_WIDTH+1, 8, "    [[%.1f, %.1f]] m/s",
                   map->GetUVelocity(mouse->x, mouse->y),
                   map->GetVVelocity(mouse->x, mouse->y));
+  gui->Render();
+
+  // Print out results
   terminal_refresh();
+
 };
 
 void Engine::RenderActor(Actor* actor) {
@@ -99,10 +105,14 @@ void Engine::RenderActor(Actor* actor) {
 void Engine::Update() {
   // Update the actos
   player->Update();
+
   // Update the map
   width = terminal_state(TK_WIDTH);
   height = terminal_state(TK_HEIGHT);
   map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
+
+  // Update the gui
+  gui->Update();
 };
 
 void Engine::Run() {
