@@ -78,26 +78,35 @@ void MonsterAi::Update(Actor *owner) {
  * @param targety
  */
 void MonsterAi::moveOrAttack(Actor *owner, int targetx, int targety) {
-  int dx = targetx - owner->x;
-  int dy = targety - owner->y;
-  int stepdx = (dx > 0 ? 1:-1);
-  int stepdy = (dy > 0 ? 1:-1);
-  float distance=sqrtf(dx*dx+dy*dy);
-  if ( distance >= 2 ) {
-    //TODO: The movement here is really simplistic...
-    dx = (int)(round(dx/distance));
-    dy = (int)(round(dy/distance));
-    if ( engine.map->CanWalk(owner->x+dx,owner->y+dy) ) {
-      owner->x += dx;
-      owner->y += dy;
-    } else if ( engine.map->CanWalk(owner->x+stepdx,owner->y) ) {
-      owner->x += stepdx;
-    } else if ( engine.map->CanWalk(owner->x,owner->y+stepdy) ) {
-      owner->y += stepdy;
-    }
-  } else if ( owner->attacker ) {
-    owner->attacker->Attack(owner,engine.player,0);
-  }
+  for (int i=0; i<owner->speed; i++) {
+      int dx = targetx - owner->x;
+      int dy = targety - owner->y;
+      int stepdx = (dx > 0 ? 1:-1);
+      int stepdy = (dy > 0 ? 1:-1);
+      float distance=sqrtf(dx*dx+dy*dy);
+      if ( distance >= 2 ) {
+        //TODO: The movement here is really simplistic...
+        dx = (int)(round(dx/distance));
+        dy = (int)(round(dy/distance));
+        if (engine.map->CanWalk(owner->x+dx,owner->y+dy) && 
+            (!engine.map->isWater(owner->x+dx,owner->y+dy) || 
+            owner->can_fly)) {
+          owner->x += dx;
+          owner->y += dy;
+        } else if ( engine.map->CanWalk(owner->x+stepdx,owner->y) && 
+                   (!engine.map->isWater(owner->x+stepdx,owner->y) || 
+                   owner->can_fly)) {
+          owner->x += stepdx;
+        } else if (engine.map->CanWalk(owner->x,owner->y+stepdy) && 
+                   (!engine.map->isWater(owner->x,owner->y+stepdy) || 
+                   owner->can_fly)) {
+          owner->y += stepdy;
+        }
+      } else if ( owner->attacker && i<(owner->speed)) {
+        owner->attacker->Attack(owner,engine.player,0);
+        break;
+      }
+   }
 }
 
 

@@ -69,6 +69,7 @@ class Map {
 
   Map(int width, int height);
   bool isWall(int x, int y) const;
+  bool isWater(int x, int y) const;
   Position GetPlayerStart() const;
   float GetUVelocity(int x, int y) const;
   float GetVVelocity(int x, int y) const;

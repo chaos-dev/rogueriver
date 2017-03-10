@@ -52,8 +52,16 @@ Map::Map(int width, int height)
   while (num_enemies > 0) {
     int x = (int)(dist(engine.rng)*width);
     int y = (int)(dist(engine.rng)*height);
-    AddMonster(x,y);
-    num_enemies--;
+    if (CanWalk(x,y)) {
+        AddMonster(x,y);
+        Actor* new_monster = engine.actors.back();
+        if (isWater(x,y) && !new_monster->can_fly) {
+            engine.actors.pop_back();
+            delete new_monster;
+        } else {
+            num_enemies--;
+        }
+    };
   };
   
 };
@@ -61,6 +69,14 @@ Map::Map(int width, int height)
 bool Map::isWall(int x, int y) const {
   if (inBounds(x,y)) {
     return !tiles.at(x+y*width).canWalk;
+  } else {
+    return false;
+  }
+};
+
+bool Map::isWater(int x, int y) const {
+  if (inBounds(x,y)) {
+    return (tiles.at(x+y*width).vel > 0.2);
   } else {
     return false;
   }
@@ -129,14 +145,15 @@ void Map::AddMonster(int x, int y) {
    std::uniform_real_distribution<> dist(0,100);
    float roll = dist(engine.rng);
    if ( roll < 70 ) {
-        Actor *centaur = new Actor(x,y,'c',"centaur");
+        Actor *centaur = new Actor(x,y,'c',"centaur",Color(240,240,240),1);
         centaur->destructible = new MonsterDestructible(16,0,"dead centaur");
         centaur->attacker = new Attacker(6,9,14,150);
         centaur->ai = new MonsterAi();
         engine.actors.push_back(centaur);
     } else {
-        Actor *harpy = new Actor(x,y,'h',"harpy");
+        Actor *harpy = new Actor(x,y,'h',"harpy",Color(240,240,240),3);
         harpy->destructible = new MonsterDestructible(26,0,"dead harpy");
+        harpy->can_fly = true;
         harpy->attacker = new Attacker(14,15,12,0);
         harpy->ai = new MonsterAi();
         engine.actors.push_back(harpy);

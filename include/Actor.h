@@ -32,14 +32,16 @@ class Actor {
  public:
   int x, y;
   int symbol;
+  int speed;
   const char* name;
+  bool can_fly;
   bool blocks;
   Color color;
   Ai* ai;
   Destructible* destructible;
   Attacker* attacker;
   
-  Actor(int x, int y, int symbol, const char* name);
+  Actor(int x, int y, int symbol, const char *name, Color color, int speed);
   ~Actor();
   void Update();
   void ProcessInput(int key, bool shift);

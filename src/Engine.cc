@@ -51,7 +51,7 @@ Engine::Engine() {
   Position player_start = map->GetPlayerStart();
   camera = new Position(player_start.x, player_start.y);
   
-  player = new Actor(player_start.x, player_start.y, (int)'@', "player");
+  player = new Actor(player_start.x, player_start.y, (int)'@', "player", Color(240,240,240), 1);
   player->ai = new PlayerAi();
   player->destructible=new PlayerDestructible(45,9,"your cadaver");
   player->attacker = new Attacker(15,16,19,32);
