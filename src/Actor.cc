@@ -27,16 +27,19 @@
  *
  * @param x - The x position of the actor
  * @param y - The y position of the actor
- * @param ch - An integer representing the ASCII number for the actor's symbol
+ * @param symbol - An integer representing the ASCII number for the actor's symbol
  * @param name - A character array with the name of the actor
- * @param col - The color of the foreground for the actor's symbol
  */
 Actor::Actor(int x, int y, int symbol, const char *name) :
-             x(x),y(y),symbol(symbol),name(name),ai(nullptr), blocks(true) {
+             x(x),y(y),symbol(symbol),name(name),ai(nullptr),
+             destructible(nullptr), attacker(nullptr), 
+             blocks(true), color(250,250,250) {
 };
 
 Actor::~Actor() {
   if ( ai ) delete ai;
+  if ( destructible ) delete destructible;
+  if ( attacker ) delete attacker;
 };
 
 void Actor::Update() {

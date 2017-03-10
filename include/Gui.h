@@ -37,8 +37,8 @@ struct Message {
 class Log {
  private:
   const int sidebar_width;
-  const int padding_left = 4;
-  const int padding_right = 4;
+  const int padding_left = 2;
+  const int padding_right = 2;
   const int padding_top = 16;
   const int padding_bottom = 2;
   const int mouse_scroll_step = 2; // 2 text rows per mouse wheel step.

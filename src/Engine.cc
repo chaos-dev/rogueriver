@@ -18,17 +18,18 @@
 
 #include "Engine.h"
 
+#include <iostream>
+
 #include "Actor.h"
 #include "Ai.h"
+#include "Attacker.h"
 
 #include "BearLibTerminal.h"
-
-#include <iostream>
 
 Engine::Engine() {
   terminal_open();
   // Terminal settings
-  terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, minimum-size=80x24");
+  terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, size=132x43, minimum-size=80x24");
   terminal_set("font: graphics/VeraMono.ttf, size=8x16");
   terminal_set("tile font: graphics/Anikki_square_16x16.bmp, size=16x16, codepage=437, align=top-left");
   terminal_set("input.filter={keyboard, mouse+}, precise-mouse=true");
@@ -49,8 +50,11 @@ Engine::Engine() {
   map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
   Position player_start = map->GetPlayerStart();
   camera = new Position(player_start.x, player_start.y);
+  
   player = new Actor(player_start.x, player_start.y, (int)'@', "player");
   player->ai = new PlayerAi();
+  player->destructible=new PlayerDestructible(50,5,"your cadaver");
+  player->attacker = new Attacker(15,15,15);
   engine.actors.push_back(player);
 };
 

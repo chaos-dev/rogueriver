@@ -19,6 +19,9 @@
 #include "Gui.h"
 
 #include <stdarg.h>
+#include <algorithm>
+
+#include <iostream>
 
 #include "BearLibTerminal.h"
 
@@ -42,10 +45,14 @@ void Log::Print(const char* message, ...) {
   
   const std::string str(buf);
   messages.push_back(Message(str));
+  UpdateHeights();
+  UpdateGeometry();
 }
 
 void Log::Print(const std::string& message) {
   messages.push_back(Message(message));
+  UpdateHeights();
+  UpdateGeometry();
 }
 
 void Log::ProcessInput(int key) {
@@ -141,8 +148,7 @@ void Log::Update() {
 
 int Log::UpdateHeights() {
 	int total_height = 0;
-	for (auto& message: messages)
-	{
+	for (auto& message: messages) {
 		message.height = terminal_measure_ext(frame_width, 0, message.text.c_str()).height;
 		total_height += message.height;
 	}
@@ -154,6 +160,8 @@ int Log::UpdateHeights() {
 }
 
 void Log::UpdateGeometry() {
+  bool at_bottom = ((frame_offset + frame_height) == total_messages_height);
+
   // Save current scroll position
   float current_offset_percentage = frame_offset / (float)total_messages_height;
 
@@ -169,8 +177,12 @@ void Log::UpdateGeometry() {
   scrollbar_height = std::min<int>(std::ceil(frame_height * (frame_height/(float)total_messages_height)), frame_height);
 
   // Try to recover scroll position
-  frame_offset = total_messages_height * current_offset_percentage;
-  frame_offset = std::min(frame_offset, total_messages_height - frame_height);
+  if (at_bottom) {
+    frame_offset = total_messages_height - frame_height;
+  } else {
+      frame_offset = total_messages_height * current_offset_percentage;
+      frame_offset = std::min(frame_offset, total_messages_height - frame_height);
+  }
   if (total_messages_height <= frame_height) frame_offset = 0;
 }
 

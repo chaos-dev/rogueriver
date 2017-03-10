@@ -96,10 +96,9 @@ void MonsterAi::moveOrAttack(Actor *owner, int targetx, int targety) {
     } else if ( engine.map->CanWalk(owner->x,owner->y+stepdy) ) {
       owner->y += stepdy;
     }
-  } /**else if ( owner->attacker ) {
-    //TODO: Add melee option if adjacent
-    owner->attacker->melee(owner,engine.player);
-  }*/
+  } else if ( owner->attacker ) {
+    owner->attacker->Attack(owner,engine.player,0);
+  }
 }
 
 
@@ -124,11 +123,10 @@ bool PlayerAi::isActive(Actor *owner) {
  * @param owner - A pointer to the player character.
  */
 void PlayerAi::Update(Actor *owner) {
-  //FIXME: Don't update dead player
-  //Check to see if the player is dead:
-  //if ( owner->destructible && owner->destructible->isDead() ) {
-  //  return;
-  //}
+  // Check to see if the player is dead:
+  if ( owner->destructible && owner->destructible->isDead() ) {
+        return;
+  }
 
   //Process any movement
   if (move == true) {
@@ -183,7 +181,20 @@ void PlayerAi::ProcessInput(Actor *owner, int key, bool shift) {
 bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
 
   if ( engine.map->isWall(targetx,targety) ) return false;
+  
+  // look for living actors to attack
+  for (Actor* actor : engine.actors) {
+    if ( actor->destructible && !actor->destructible->isDead()
+        && actor->x == targetx && actor->y == targety 
+        && actor != engine.player) {
+      owner->attacker->Attack(owner, actor, 0);
+      return false;
+    }
+  }
+
+  
   // I cheat a little here to give the player a favorable rounding
+  int temp_x = owner->x; int temp_y = owner->y;
   if (owner->x == targetx) {
     owner->x=targetx + std::round(engine.map->GetUVelocity(owner->x, owner->y));
   } else {
@@ -194,5 +205,20 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
   } else {
     owner->y=targety + std::trunc(engine.map->GetVVelocity(owner->x, owner->y));
   }
+  
+  if ((targetx != owner->x || targety != owner->y) && 
+      (owner->x == temp_x && owner->y == temp_y))
+      engine.gui->log->Print("You fight the current, but make no progress.");
+  
+  // look for corpses or items
+  for (Actor* actor : engine.actors) {
+    //bool corpseOrItem=(actor->destructible && actor->destructible->isDead())
+	//		    || actor->pickable;
+	bool corpse_or_item = (actor->destructible && actor->destructible->isDead());
+    if ( corpse_or_item && owner->x == targetx && actor->y == owner->y ) {
+      engine.gui->log->Print("There's a %s here.",actor->name);
+    }
+  }
+  
   return true;
 }

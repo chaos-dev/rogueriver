@@ -16,34 +16,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef INCLUDE_ACTOR_H_
-#define INCLUDE_ACTOR_H_
+ 
+#ifndef INCLUDE_ATTACKER_H_
+#define INCLUDE_ATTACKER_H_
 
 class Actor;
-#include "Ai.h"
-#include "Color.h"
-#include "Destructible.h"
-#include "Attacker.h"
 
-class Actor {
- private:
-  float GetDistance(int cx, int cy) const;
-  
- public:
-  int x, y;
-  int symbol;
-  const char* name;
-  bool blocks;
-  Color color;
-  Ai* ai;
-  Destructible* destructible;
-  Attacker* attacker;
-  
-  Actor(int x, int y, int symbol, const char* name);
-  ~Actor();
-  void Update();
-  void ProcessInput(int key, bool shift);
+class Attacker {
+protected:
+    int attack;
+    int dodge;
+    int mean_damage;
+	bool DoesItHit(int dice, int mod, Actor *target);
+	int GetDamage(int mean_damage, int mod, Actor* target);
+	void Message(bool hits, bool penetrates, int damage, Actor *owner, Actor *target);
+
+public :
+	Attacker();
+	Attacker(int attack, int dodge, int mean_damage);
+	void Attack(Actor *owner, Actor *target, int mod);
 };
-
-#endif /* INCLUDE_ACTOR_H_ */
+#endif // INCLUDE_ATTACKER_H_
