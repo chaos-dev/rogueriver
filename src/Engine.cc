@@ -23,6 +23,8 @@
 
 #include "BearLibTerminal.h"
 
+#include <iostream>
+
 Engine::Engine() {
   terminal_open();
   // Terminal settings
@@ -38,6 +40,9 @@ Engine::Engine() {
   status = OPEN;
   mouse = new Position(terminal_state(TK_MOUSE_X), terminal_state(TK_MOUSE_Y));
 
+  // Seed RNG
+  rng.seed(std::random_device()());
+
   // Initialize members
   gui = new Gui(SIDEBAR_WIDTH);
   map = new Map(MAP_WIDTH, MAP_HEIGHT);
@@ -46,6 +51,7 @@ Engine::Engine() {
   camera = new Position(player_start.x, player_start.y);
   player = new Actor(player_start.x, player_start.y, (int)'@', "player");
   player->ai = new PlayerAi();
+  engine.actors.push_back(player);
 };
 
 Engine::~Engine() {
@@ -76,7 +82,9 @@ void Engine::Render() {
   
   // Actors
   terminal_layer(1);
-  RenderActor(player);
+  for (Actor* actor : actors) {
+    RenderActor(actor);
+  };
   
   // Gui
   terminal_layer(2);
@@ -96,15 +104,23 @@ void Engine::Render() {
 
 void Engine::RenderActor(Actor* actor) {
   int term_x = (actor->x - camera->x)*2 + map_panel.width/2;
-  int term_y = actor->y - camera->y + map_panel.height/2;
-  terminal_bkcolor(terminal_pick_color(term_x, term_y, 0));
-  terminal_printf(term_x, term_y, "[font=tile]%c", (char*)actor->symbol);
-  terminal_bkcolor(color_from_name("black"));
+  int term_y = -actor->y + camera->y + map_panel.height/2;
+  if (term_x < map_panel.width-1 && term_y < map_panel.height) {
+      terminal_bkcolor(terminal_pick_color(term_x, term_y, 0));
+      terminal_printf(term_x, term_y, "[font=tile]%c", (char*)actor->symbol);
+      terminal_bkcolor(color_from_name("black"));
+  };
 };
 
 void Engine::Update() {
-  // Update the actos
+  game_status = IDLE;
+  // Update the actors
   player->Update();
+  if (game_status == NEW_TURN) {
+    for (Actor* actor : actors) {
+        if (actor != player) actor->Update();
+    };
+  };
 
   // Update the map
   width = terminal_state(TK_WIDTH);

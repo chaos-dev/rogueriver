@@ -25,16 +25,10 @@
 #include <sstream>
 
 // A string plus its precalculated height.
-struct Message
-{
-	Message():
-		height(0)
-	{ }
+struct Message {
+	Message() : height(0) { };
 
-	Message(const std::string& text):
-		text(text),
-		height(0)
-	{ }
+	Message(const std::string& text) : text(text), height(0) { };
 
 	std::string text;
 	int height;
@@ -66,8 +60,8 @@ class Log {
   void ScrollToPixel(int py);
  public:
   Log(int sidebar_width);
-  void Add(const char* message);
-  void Add(const std::string& message);
+  void Print(const char* message, ...);
+  void Print(const std::string& message);
   void ProcessInput(int key);
   void Update();
   void Render();

@@ -35,8 +35,7 @@ class River {
   std::vector<float> width;
   std::vector<float> shape;
   std::vector<float> mean_velocity;
-  std::mt19937 rng;
-
+  
   std::vector<float> RandomSignal(int n, float y_min, float y_max, float min_period, float max_period, int num_periods);
  public:
   River(int length);

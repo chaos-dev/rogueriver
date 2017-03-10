@@ -20,12 +20,13 @@
 
 #include <cmath>
 
+#include "Engine.h"
+
 River::River(int length) : length(length) {
   width.resize(length);
   shape.resize(length);
   angle.resize(length);
   mean_velocity.resize(length);
-  rng.seed(std::random_device()());
 
   // Create the river
   width = RandomSignal(length, min_width, max_width, length/2.0, length*2.0, num_periods);
@@ -60,11 +61,11 @@ std::vector<float> River::RandomSignal(int n, float y_min, float y_max,
   std::vector<float> shifts(num_periods);
 
   std::uniform_real_distribution<> dist(0,1);
-  periods[0] = std::exp(dist(rng)*0.25*(max_log - min_log) + min_log);
-  periods[1] = std::exp(dist(rng)*(max_log - min_log) + min_log);
-  periods[2] = std::exp((0.75 + dist(rng)*0.25)*(max_log - min_log) + min_log);
+  periods[0] = std::exp(dist(engine.rng)*0.25*(max_log - min_log) + min_log);
+  periods[1] = std::exp(dist(engine.rng)*(max_log - min_log) + min_log);
+  periods[2] = std::exp((0.75 + dist(engine.rng)*0.25)*(max_log - min_log) + min_log);
   for (int i = 0; i<num_periods; i++)
-    shifts[i] = dist(rng)*2.0*pi;
+    shifts[i] = dist(engine.rng)*2.0*pi;
 
   std::vector<float> signal(n);
   for (int i = 0; i<n; i++) {

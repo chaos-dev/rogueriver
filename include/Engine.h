@@ -20,6 +20,9 @@
 #ifndef INCLUDE_ENGINE_H_
 #define INCLUDE_ENGINE_H_
 
+#include <vector>
+#include <random>
+
 #include "Map.h"
 #include "Actor.h"
 #include "Ai.h"
@@ -47,6 +50,15 @@ class Engine {
   Map* map;
   Position* camera;
   Gui* gui;
+  std::vector<Actor*> actors;
+  std::mt19937 rng;  // Random number generator
+  enum GameStatus {
+    STARTUP,
+    IDLE,
+    NEW_TURN,
+    VICTORY,
+    DEFEAT
+  } game_status;
 
   Engine();
   ~Engine();

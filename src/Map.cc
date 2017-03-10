@@ -19,9 +19,12 @@
 #include "Map.h"
 
 #include <cmath>
+#include <random>
 
 #include "BearLibTerminal.h"
 #include "Color.h"
+#include "Actor.h"
+#include "Engine.h"
 
 Map::Map(int width, int height)
     : width(width), height(height), 
@@ -44,6 +47,15 @@ Map::Map(int width, int height)
       }
     }
   }
+  std::uniform_real_distribution<> dist(0,1);
+  int num_enemies = (int)dist(engine.rng)*20+40;
+  while (num_enemies > 0) {
+    int x = (int)(dist(engine.rng)*width);
+    int y = (int)(dist(engine.rng)*height);
+    AddMonster(x,y);
+    num_enemies--;
+  };
+  
 };
 
 bool Map::isWall(int x, int y) const {
@@ -105,13 +117,31 @@ bool Map::CanWalk(int x, int y) const {
     // this is a wall
     return false;
   }
-//  for (Actor **iterator=engine.actors.begin();
-//      iterator!=engine.actors.end();iterator++) {
-//    Actor *actor=*iterator;
-//    if ( actor->blocks && actor->x == x && actor->y == y ) {
-//      // there is a blocking actor here. cannot walk
-//      return false;
-//    }
-//  }
+  for (Actor* actor : engine.actors) {
+    if ( actor->blocks && actor->x == x && actor->y == y ) {
+      return false;
+    }
+  }
   return true;
 }
+
+void Map::AddMonster(int x, int y) {
+   std::uniform_real_distribution<> dist(0,100);
+   float roll = dist(engine.rng);
+   if ( roll < 70 ) {
+        Actor *centaur = new Actor(x,y,'c',"centaur");
+        //orc->destructible = new MonsterDestructible(10,0,"dead orc",35);
+        //orc->attacker = new Attacker(3);
+        centaur->ai = new MonsterAi();
+        engine.actors.push_back(centaur);
+    } else {
+        Actor *harpy = new Actor(x,y,'h',"harpy");
+        //troll->destructible = new MonsterDestructible(16,1,"troll carcass",100);
+        //troll->attacker = new Attacker(4);
+        harpy->ai = new MonsterAi();
+        engine.actors.push_back(harpy);
+    }
+};
+
+void Map::AddItem(int x, int y) {
+};

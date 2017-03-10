@@ -22,6 +22,7 @@
 
 class Actor;
 #include "Ai.h"
+#include "Color.h"
 
 class Actor {
  private:

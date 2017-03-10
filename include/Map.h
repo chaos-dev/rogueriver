@@ -57,9 +57,12 @@ class Map {
  protected:
   Color beach_color, water_color, bg_color;
   std::vector<Tile> tiles;
+  River* river;
+  void AddMonster(int x, int y);
+  void AddItem(int x, int y);
+  
   void SetWall(int x, int y);
   bool inBounds(int x, int y) const;
-  River* river;
  public:
   int width, height;
   Position camera;

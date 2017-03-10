@@ -18,11 +18,9 @@
 
 #include "Gui.h"
 
-#include <iostream>
+#include <stdarg.h>
 
 #include "BearLibTerminal.h"
-
-
 
 Log::Log(int sidebar_width) : sidebar_width(sidebar_width) {
   Reset();
@@ -30,15 +28,23 @@ Log::Log(int sidebar_width) : sidebar_width(sidebar_width) {
       "Use arrow keys or mouse wheel to scroll the list up and down. "
       "Try to resize the window.\n--- --- ---";
   messages.push_back(Message(prompt));
+  Print("%d goblins appear!",2);
   UpdateGeometry();
 };
 
-void Log::Add(const char* message) {
-  const std::string str(message);
+void Log::Print(const char* message, ...) {
+  // build the text
+  va_list ap;
+  char buf[128];
+  va_start(ap,message);
+  vsprintf(buf,message,ap);
+  va_end(ap);
+  
+  const std::string str(buf);
   messages.push_back(Message(str));
 }
 
-void Log::Add(const std::string& message) {
+void Log::Print(const std::string& message) {
   messages.push_back(Message(message));
 }
 

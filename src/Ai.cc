@@ -27,7 +27,7 @@
 #include "Actor.h"
 #include "Engine.h"
 
-MonsterAi::MonsterAi() {
+MonsterAi::MonsterAi() : active(false) {
 }
 
 /** Checks to see if a monster should be updated/considered this turn.
@@ -132,6 +132,7 @@ void PlayerAi::Update(Actor *owner) {
 
   //Process any movement
   if (move == true) {
+    engine.game_status = Engine::NEW_TURN;
     moveOrAttack(owner, owner->x+dx,owner->y+dy);
     engine.camera->x = owner->x; engine.camera->y = owner->y;
     dx = 0; dy = 0;

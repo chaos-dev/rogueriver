@@ -45,7 +45,7 @@ public :
 	bool isActive(Actor *owner);
 protected :
   bool active; // Is the monster active?
-	void moveOrAttack(Actor *owner, int targetx, int targety);
+  void moveOrAttack(Actor *owner, int targetx, int targety);
 };
 
 class PlayerAi : public Ai {
