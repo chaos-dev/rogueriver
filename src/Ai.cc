@@ -126,9 +126,16 @@ void PlayerAi::Update(Actor *owner) {
   if ( owner->destructible && owner->destructible->isDead() ) {
         return;
   }
+  
+  if (engine.game_status == Engine::AIMING) {
+    if (owner->attacker->UpdateFiring(owner)) {
+        dx = 0; dy = 0;
+        move = true;
+    }
+  };
 
-  //Process any movement
-  if (move == true) {
+  // Process any movement
+  if (move) {
     engine.game_status = Engine::NEW_TURN;
     moveOrAttack(owner, owner->x+dx,owner->y+dy);
     engine.camera->x = owner->x; engine.camera->y = owner->y;
@@ -156,6 +163,9 @@ void PlayerAi::ProcessInput(Actor *owner, int key, bool shift) {
     dx = 1; dy = 1; move = true;
   } else if (key == TK_KP_5 || (key == TK_PERIOD && !shift)) {
     dx = 0; dy = 0; move = true;
+  } else if (key == TK_F && !shift) {
+    engine.game_status = Engine::AIMING;
+    engine.gui->log->Print("Click any square to aim, or press spacebar to cancel.");
   } else if (key == TK_R && !shift) {
     if (running) {
       running = false;
@@ -175,19 +185,23 @@ void PlayerAi::ProcessInput(Actor *owner, int key, bool shift) {
  * @param targetx - The x coordinate where the character wants to move
  * @param targety - The y coordinate where the character wants to move
  * @return True if the player moved to that square, false under any other
- *          action, including trying to walk into walls or attacking.
+ *          action, including trying to walk into walls.
  */
 bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
 
   if ( engine.map->isWall(targetx,targety) ) return false;
   
   // look for living actors to attack
+  bool attacked = false;
   for (Actor* actor : engine.actors) {
     if ( actor->destructible && !actor->destructible->isDead()
         && actor->x == targetx && actor->y == targety 
         && actor != engine.player) {
       owner->attacker->Attack(owner, actor, 0);
-      return false;
+      attacked = true;
+      targetx = owner->x;
+      targety = owner->y;
+      break;
     }
   }
 
@@ -205,19 +219,22 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
     owner->y=targety + std::trunc(engine.map->GetVVelocity(owner->x, owner->y));
   }
   
-  if ((targetx != owner->x || targety != owner->y) && 
-      (owner->x == temp_x && owner->y == temp_y))
+  bool moved = (owner->x != temp_x || owner->y != temp_y);
+  if ((targetx != owner->x || targety != owner->y) && !moved && !attacked)
       engine.gui->log->Print("You fight the current, but make no progress.");
   
   // look for corpses or items
-  for (Actor* actor : engine.actors) {
-    //bool corpseOrItem=(actor->destructible && actor->destructible->isDead())
-	//		    || actor->pickable;
-	bool corpse_or_item = (actor->destructible && actor->destructible->isDead());
-    if ( corpse_or_item && actor->x == owner->x && actor->y == owner->y ) {
-      engine.gui->log->Print("There's a %s here.",actor->name);
-    }
+  if (moved) {
+      for (Actor* actor : engine.actors) {
+        //bool corpseOrItem=(actor->destructible && actor->destructible->isDead())
+	    //		    || actor->pickable;
+	    bool corpse_or_item = (actor->destructible && actor->destructible->isDead());
+        if ( corpse_or_item && actor->x == owner->x && actor->y == owner->y ) {
+          engine.gui->log->Print("There's a %s here.",actor->name);
+        }
+      }
   }
   
   return true;
+  
 }

@@ -101,7 +101,7 @@ void Log::Render() {
       // This message is partially visible
       break;
     }
-    first_line += message.height + 1;
+    first_line += message.height + line_padding;
   }
   int delta = first_line - frame_offset;
 
@@ -111,7 +111,7 @@ void Log::Render() {
     auto& message = messages[index];
     terminal_print_ext(sidebar_start+padding_left, padding_top+delta, 
                        frame_width, 0, TK_ALIGN_DEFAULT, message.text.c_str());
-    delta += message.height + 1;
+    delta += message.height+line_padding;
   }
   terminal_crop(sidebar_start+padding_left, padding_top,
                 frame_width, frame_height);
@@ -152,9 +152,9 @@ int Log::UpdateHeights() {
 		message.height = terminal_measure_ext(frame_width, 0, message.text.c_str()).height;
 		total_height += message.height;
 	}
-
-	// Add blank lines between messages
-	total_height += messages.size()-1;
+	
+	// Add spaces between lines
+	total_height += (messages.size()-1)*line_padding;
 
 	return total_height;
 }

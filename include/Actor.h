@@ -28,7 +28,6 @@ class Actor;
 
 class Actor {
  private:
-  float GetDistance(int cx, int cy) const;
   
  public:
   int x, y;
@@ -44,6 +43,7 @@ class Actor {
   ~Actor();
   void Update();
   void ProcessInput(int key, bool shift);
+  float GetDistance(int cx, int cy) const;
 };
 
 #endif /* INCLUDE_ACTOR_H_ */

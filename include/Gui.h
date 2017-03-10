@@ -42,6 +42,7 @@ class Log {
   const int padding_top = 16;
   const int padding_bottom = 2;
   const int mouse_scroll_step = 2; // 2 text rows per mouse wheel step.
+  const int line_padding = 0;
   int sidebar_start;
   int scrollbar_column;
   int scrollbar_offset;

@@ -130,14 +130,14 @@ void Map::AddMonster(int x, int y) {
    float roll = dist(engine.rng);
    if ( roll < 70 ) {
         Actor *centaur = new Actor(x,y,'c',"centaur");
-        centaur->destructible = new MonsterDestructible(10,0,"dead centaur");
-        centaur->attacker = new Attacker(3,3,3);
+        centaur->destructible = new MonsterDestructible(16,0,"dead centaur");
+        centaur->attacker = new Attacker(6,9,14,150);
         centaur->ai = new MonsterAi();
         engine.actors.push_back(centaur);
     } else {
         Actor *harpy = new Actor(x,y,'h',"harpy");
-        harpy->destructible = new MonsterDestructible(16,1,"dead harpy");
-        harpy->attacker = new Attacker(4,4,4);
+        harpy->destructible = new MonsterDestructible(26,0,"dead harpy");
+        harpy->attacker = new Attacker(14,15,12,0);
         harpy->ai = new MonsterAi();
         engine.actors.push_back(harpy);
     }

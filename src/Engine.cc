@@ -53,8 +53,8 @@ Engine::Engine() {
   
   player = new Actor(player_start.x, player_start.y, (int)'@', "player");
   player->ai = new PlayerAi();
-  player->destructible=new PlayerDestructible(50,5,"your cadaver");
-  player->attacker = new Attacker(15,15,15);
+  player->destructible=new PlayerDestructible(45,9,"your cadaver");
+  player->attacker = new Attacker(15,16,19,32);
   engine.actors.push_back(player);
 };
 
@@ -66,7 +66,12 @@ void Engine::ProcessInput() {
     while (terminal_has_input()) {
       int key = terminal_read();
       bool shift = terminal_check(TK_SHIFT);
-      player->ProcessInput(key, shift);
+      if (game_status == AIMING) {
+        int x, y;
+        engine.PickATile(key, &x, &y, player->attacker->max_range);
+      } else {
+        player->ProcessInput(key, shift);
+      }
       gui->ProcessInput(key);
       if (key == TK_CLOSE || key == TK_ESCAPE) {
         status = CLOSED;
@@ -91,14 +96,20 @@ void Engine::Render() {
   };
   
   // Gui
+  terminal_layer(0);
+  terminal_bkcolor("darkest gray");
+  terminal_clear_area(terminal_state(TK_WIDTH)-SIDEBAR_WIDTH+1,1,terminal_state(TK_WIDTH)-1,10);
   terminal_layer(2);
-  terminal_print(width-SIDEBAR_WIDTH+1, 1, "River: Acheron");
-  terminal_printf(width-SIDEBAR_WIDTH+1, 3, "Player X: %d  Y: %d", player->x, player->y);
-  terminal_printf(width-SIDEBAR_WIDTH+1, 5, "Cursor X: %d  Y: %d", mouse->x, mouse->y);
-  terminal_printf(width-SIDEBAR_WIDTH+1, 7, "River Velocity Under Cursor:");
-  terminal_printf(width-SIDEBAR_WIDTH+1, 8, "    [[%.1f, %.1f]] m/s",
-                  map->GetUVelocity(mouse->x, mouse->y),
-                  map->GetVVelocity(mouse->x, mouse->y));
+  terminal_print(width-SIDEBAR_WIDTH+1, 2, "River: Acheron");
+  terminal_printf(width-SIDEBAR_WIDTH+1, 4, "Player X: %d  Y: %d", player->x, player->y);
+  if (CursorOnMap()) {
+      terminal_printf(width-SIDEBAR_WIDTH+1, 6, "Cursor X: %d  Y: %d", mouse->x, mouse->y);
+      terminal_printf(width-SIDEBAR_WIDTH+1, 8, "River Velocity Under Cursor:");
+      terminal_printf(width-SIDEBAR_WIDTH+1, 9, "    [[%.1f, %.1f]] m/s",
+                      map->GetUVelocity(mouse->x, mouse->y),
+                      map->GetVVelocity(mouse->x, mouse->y));
+  };
+  terminal_bkcolor("black");
   gui->Render();
 
   // Print out results
@@ -119,14 +130,15 @@ void Engine::RenderActor(Actor* actor) {
 };
 
 void Engine::Update() {
-  game_status = IDLE;
-  // Update the actors
+  if (game_status != AIMING) {
+      game_status = IDLE;
+  }
   player->Update();
   if (game_status == NEW_TURN) {
     for (Actor* actor : actors) {
         if (actor != player) actor->Update();
-    };
-  };
+    }
+  }
 
   // Update the map
   width = terminal_state(TK_WIDTH);
@@ -144,3 +156,31 @@ void Engine::Run() {
         ProcessInput();
   }
 };
+
+bool Engine::CursorOnMap() {
+    if (terminal_state(TK_MOUSE_X) < map_panel.width-1) return true;
+};
+
+bool Engine::PickATile(int key, int *x, int *y, int max_range) {
+
+  if (key == TK_MOUSE_LEFT && CursorOnMap()) {
+    float distance = player->GetDistance(mouse->x, mouse->y);
+    if (distance < max_range) {
+      for (Actor* actor : actors) {
+        if (actor == player) continue;
+        if (actor->x == mouse->x && actor->y == mouse->y &&
+            actor->destructible && !actor->destructible->isDead()) {
+          player->attacker->SetAim(actor);
+          return true;
+        };   
+      }
+    } else {
+      engine.gui->log->Print("Your max range is %d m.\nThat space is %.1f m away.",
+                             max_range, distance);
+    }
+  } else if (key == TK_SPACE) {
+    engine.gui->log->Print("Firing canceled.");
+    engine.game_status = IDLE;
+  }
+  return false;
+}

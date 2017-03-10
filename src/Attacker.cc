@@ -21,17 +21,19 @@
 #include <algorithm>    // std::min
 #include <exception>
 #include <random>
+#include <cmath>
 
 #include "Actor.h"
 #include "Engine.h"
 
-Attacker::Attacker() {
+Attacker::Attacker() : firing(false) {
 };
 
 /** Allows initialization with combat attributes.
  */
-Attacker::Attacker(int attack, int dodge, int mean_damage)
-    : attack(attack), dodge(dodge), mean_damage(mean_damage) {
+Attacker::Attacker(int attack, int dodge, int mean_damage, int max_range)
+    : attack(attack), dodge(dodge), mean_damage(mean_damage),
+      max_range(max_range), firing(false) {
 };
 
 /** This is the core functionality behind all attacks (melee, ranged, etc.)
@@ -89,7 +91,7 @@ bool Attacker::DoesItHit(int attack_roll, int mod, Actor *target) {
 #ifndef NDEBUG
         engine.gui->log->Print("[color=grey]The dodge roll was: %d / %d", dodge_roll, target->attacker->dodge);
 #endif
-        if (attack_roll > 10 + dodge_roll + mod) {
+        if (attack_roll > dodge_roll + mod) {
             return true;
         } else {
             return false;
@@ -120,10 +122,40 @@ void Attacker::Message(bool hits, bool penetrates, int damage, Actor *owner, Act
 int Attacker::GetDamage(int mean_damage, int mod, Actor* target) {
     std::normal_distribution<float> dist(mean_damage, mean_damage/3);
     int damage = (int)std::max(0, (int)dist(engine.rng));
-    #ifndef NDEBUG
+#ifndef NDEBUG
         engine.gui->log->Print("[color=grey]The damage roll was: %d / %d", damage, mean_damage);
-    #endif
+#endif
     if (target->destructible)
         damage -= target->destructible->armor;
     return damage;
+};
+
+int Attacker::GetRangeModifier(Actor* owner, Actor* target) {
+    if (max_range == 0) {
+        return -5;
+    } else {
+        float distance = owner->GetDistance(target->x, target->y);
+        int modifier = int(15.0*std::log(distance)/
+                           std::log(float(owner->attacker->max_range)) - 5.0);
+#ifndef NDEBUG
+        engine.gui->log->Print("[color=grey]The range modifier was: %d", modifier);
+#endif
+        return modifier;
+    };
+        
+};
+
+void Attacker::SetAim(Actor* target) {
+    firing = true;
+    current_target = target;
+};
+
+bool Attacker::UpdateFiring(Actor* owner) {
+  if (firing) {
+    int mod = GetRangeModifier(owner, current_target);
+    Attack(owner, current_target, mod);
+    firing = false;
+    return true;
+  }
+  return false;
 };

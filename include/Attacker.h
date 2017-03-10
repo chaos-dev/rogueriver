@@ -24,16 +24,23 @@ class Actor;
 
 class Attacker {
 protected:
+    bool firing;
+    Actor* current_target;
     int attack;
     int dodge;
     int mean_damage;
 	bool DoesItHit(int dice, int mod, Actor *target);
 	int GetDamage(int mean_damage, int mod, Actor* target);
 	void Message(bool hits, bool penetrates, int damage, Actor *owner, Actor *target);
+	int GetRangeModifier(Actor* owner, Actor* target);
 
 public :
+    int max_range;
+    
 	Attacker();
-	Attacker(int attack, int dodge, int mean_damage);
+	Attacker(int attack, int dodge, int mean_damage, int max_range);
 	void Attack(Actor *owner, Actor *target, int mod);
+	void SetAim(Actor* target);
+	bool UpdateFiring(Actor* owner);
 };
 #endif // INCLUDE_ATTACKER_H_

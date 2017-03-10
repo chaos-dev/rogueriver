@@ -44,6 +44,8 @@ class Engine {
   void Update();
   void Render();
   void RenderActor(Actor* actor);
+  bool PickATile(int key, int *x, int *y, int max_range);
+  bool CursorOnMap();
 
  public:
   Actor* player;
@@ -56,6 +58,7 @@ class Engine {
     STARTUP,
     IDLE,
     NEW_TURN,
+    AIMING,
     VICTORY,
     DEFEAT
   } game_status;

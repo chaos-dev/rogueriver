@@ -56,7 +56,7 @@ void Destructible::die(Actor *owner) {
 	owner->blocks=false;
 
 	// make sure corpses are drawn before living actors
-	for (int i=0; i<engine.actors.size(); i++) {
+	for (unsigned int i=0; i<engine.actors.size(); i++) {
 	    if (engine.actors[i] == owner) engine.actors.erase(engine.actors.begin()+i);
 	}
 	engine.actors.push_front(owner);
