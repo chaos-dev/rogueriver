@@ -13,7 +13,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 # Manually specify C++14 for Travis CI
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
-#Relative paths are needed to ensure CPack works correctly
+# Add some smarter compiler options
+if(MSVC)
+  # Force to always compile with W4
+  if(CMAKE_CXX_FLAGS_DEBUG MATCHES "/W[0-4]")
+    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+  else()
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4")
+  endif()
+elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+  # Update if necessary
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wno-long-long")
+endif()
+
+# Relative paths are needed to ensure CPack works correctly
 set(CMAKE_USE_RELATIVE_PATHS True)
 
 # Find out if this is a 32 or 64 bit build

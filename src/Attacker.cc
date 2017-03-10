@@ -48,8 +48,8 @@ void Attacker::Attack(Actor *owner, Actor *target, int mod) {
     std::normal_distribution<float> dist(owner->attacker->attack-3,
                                          (owner->attacker->attack-3.0)/3);
 	int attack_roll = std::max(0,(int)dist(engine.rng));
-#ifdef DEBUG
-        engine.gui->log->Print("The attack roll was: %d / %d", attack_roll, owner->attacker->attack);
+#ifndef NDEBUG
+        engine.gui->log->Print("[color=grey]The attack roll was: %d / %d", attack_roll, owner->attacker->attack);
 #endif
 	int damage = 0;
 	bool hits = false;
@@ -86,8 +86,8 @@ bool Attacker::DoesItHit(int attack_roll, int mod, Actor *target) {
 	    std::normal_distribution<float> dist(target->attacker->dodge-3,
                                              (target->attacker->dodge-3.0)/3);
         int dodge_roll = std::max(0,(int)dist(engine.rng));
-#ifdef DEBUG
-        engine.gui->log->Print("The dodge roll was: %d / %d", dodge_roll, target->attacker->dodge);
+#ifndef NDEBUG
+        engine.gui->log->Print("[color=grey]The dodge roll was: %d / %d", dodge_roll, target->attacker->dodge);
 #endif
         if (attack_roll > 10 + dodge_roll + mod) {
             return true;
@@ -120,6 +120,9 @@ void Attacker::Message(bool hits, bool penetrates, int damage, Actor *owner, Act
 int Attacker::GetDamage(int mean_damage, int mod, Actor* target) {
     std::normal_distribution<float> dist(mean_damage, mean_damage/3);
     int damage = (int)std::max(0, (int)dist(engine.rng));
+    #ifndef NDEBUG
+        engine.gui->log->Print("[color=grey]The damage roll was: %d / %d", damage, mean_damage);
+    #endif
     if (target->destructible)
         damage -= target->destructible->armor;
     return damage;

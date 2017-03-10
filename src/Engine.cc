@@ -110,8 +110,10 @@ void Engine::RenderActor(Actor* actor) {
   int term_x = (actor->x - camera->x)*2 + map_panel.width/2;
   int term_y = -actor->y + camera->y + map_panel.height/2;
   if (term_x < map_panel.width-1 && term_y < map_panel.height) {
+      terminal_color(actor->color.Convert());
       terminal_bkcolor(terminal_pick_color(term_x, term_y, 0));
       terminal_printf(term_x, term_y, "[font=tile]%c", (char*)actor->symbol);
+      terminal_color(color_from_name("white"));
       terminal_bkcolor(color_from_name("black"));
   };
 };

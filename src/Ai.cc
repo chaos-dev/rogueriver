@@ -39,10 +39,9 @@ MonsterAi::MonsterAi() : active(false) {
  * @return True indicates that the monster should be updated/considered.
  */
 bool MonsterAi::isActive(Actor *owner) {
-  // FIXME: Don't update dead actors
-  //if (owner->destructible && owner->destructible->isDead()) {
-  //  return false;
-  //}
+  if (owner->destructible && owner->destructible->isDead()) {
+    return false;
+  }
   if (active) {
     return true;
   } else if (std::sqrt(std::pow(float(engine.player->x-owner->x),2) +
@@ -215,7 +214,7 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
     //bool corpseOrItem=(actor->destructible && actor->destructible->isDead())
 	//		    || actor->pickable;
 	bool corpse_or_item = (actor->destructible && actor->destructible->isDead());
-    if ( corpse_or_item && owner->x == targetx && actor->y == owner->y ) {
+    if ( corpse_or_item && actor->x == owner->x && actor->y == owner->y ) {
       engine.gui->log->Print("There's a %s here.",actor->name);
     }
   }
