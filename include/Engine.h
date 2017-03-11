@@ -30,7 +30,7 @@
 
 class Engine {
  protected:
-  const int MAP_WIDTH = 500;
+  const int MAP_WIDTH = 1000;
   const int MAP_HEIGHT = 120;
   const int SIDEBAR_WIDTH = 40;
   int width, height;

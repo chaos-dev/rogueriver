@@ -54,6 +54,7 @@ void Attacker::Attack(Actor *owner, Actor *target, int mod) {
         engine.gui->log->Print("[color=grey]The attack roll was: %d / %d", attack_roll, owner->attacker->attack);
 #endif
 	int damage = 0;
+	bool dodged = false;
 	bool hits = false;
 	bool penetrates = false;
 
@@ -62,9 +63,11 @@ void Attacker::Attack(Actor *owner, Actor *target, int mod) {
 		damage = owner->attacker->GetDamage(owner->attacker->mean_damage, 0, target);
 		if (damage > 0) penetrates = true;
 	    damage = std::min(target->destructible->hp,damage);
+    } else if (attack_roll > 10) {
+        dodged = true;
     }
     
-	owner->attacker->Message(hits,penetrates,damage,owner,target);	//Display a message.
+	owner->attacker->Message(hits,penetrates,dodged,damage,owner,target);
 	//Taking damage must happen after the message is displayed. Otherwise the
 	//  messages about leveling up, killing, etc. happen before the attack
 	//  messages. This would also lead to the killing blow reading
@@ -101,9 +104,15 @@ bool Attacker::DoesItHit(int attack_roll, int mod, Actor *target) {
 	};
 };
 
-void Attacker::Message(bool hits, bool penetrates, int damage, Actor *owner, Actor *target) {
+void Attacker::Message(bool hits, bool penetrates, bool dodged, int damage, Actor *owner, Actor *target) {
 	if (target->destructible) {
-		if ( penetrates ) {
+	    if ( dodged ) {
+		    const char* temp_word = ((owner == engine.player)? "r" : "'s");
+			engine.gui->log->Print("%s dodges away from %s%s %s.",
+			                       target->words->Name,
+			                       owner->words->name, temp_word, 
+			                       owner->words->weapon.c_str());
+	    } else if ( penetrates ) {
 		    const char* temp_word = ((owner == engine.player)? "hit" : "hits");
 			engine.gui->log->Print("%s %s %s with %s %s, dealing %d damage.", 
 			                       owner->words->Name,
@@ -120,9 +129,10 @@ void Attacker::Message(bool hits, bool penetrates, int damage, Actor *owner, Act
 			                       owner->words->weapon.c_str());
 		} else if ( !penetrates ) {
 		    const char* temp_word = ((owner == engine.player)? "r" : "'s");
-			engine.gui->log->Print("%s attack bounces off %s %s %s.",
-			                       owner->words->Name,
-			                       target->words->name, temp_word, 
+		    const char* temp_word2 = ((target == engine.player)? "r" : "'s");
+			engine.gui->log->Print("%s%s attack bounces off %s%s %s.",
+			                       owner->words->Name, temp_word,
+			                       target->words->name, temp_word2, 
 			                       target->words->armor.c_str());
 		};
 	} else {

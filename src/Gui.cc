@@ -20,12 +20,11 @@
 
 #include <stdarg.h>
 #include <algorithm>
-
 #include <iostream>
 
 #include "BearLibTerminal.h"
 
-Log::Log(int sidebar_width) : sidebar_width(sidebar_width) {
+Log::Log(int sidebar_width) : sidebar_width(sidebar_width), duplicate_count(1) {
   Reset();
   const std::string prompt =
       "Use arrow keys or mouse wheel to scroll the list up and down. "
@@ -43,7 +42,18 @@ void Log::Print(const char* message, ...) {
   vsprintf(buf,message,ap);
   va_end(ap);
   
-  const std::string str(buf);
+  std::string str(buf);
+  
+  // Compare this message to the last one
+  const std::string last_msg = messages.back().text;
+  if (str.compare(0,str.size(),last_msg,0,str.size()) == 0) {
+    duplicate_count++;
+    messages.pop_back();
+    str += " [[x" + std::to_string(duplicate_count) + "]]";
+  } else {
+    duplicate_count = 1;
+  }
+  
   messages.push_back(Message(str));
   UpdateHeights();
   UpdateGeometry();

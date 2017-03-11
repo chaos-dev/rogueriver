@@ -59,6 +59,7 @@ class Log {
   int UpdateHeights();
   void UpdateGeometry();
   void ScrollToPixel(int py);
+  int duplicate_count;
  public:
   Log(int sidebar_width);
   void Print(const char* message, ...);

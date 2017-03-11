@@ -31,7 +31,7 @@ protected:
     int mean_damage;
 	bool DoesItHit(int dice, int mod, Actor *target);
 	int GetDamage(int mean_damage, int mod, Actor* target);
-	void Message(bool hits, bool penetrates, int damage, Actor *owner, Actor *target);
+	void Message(bool hits, bool penetrates, bool dodged, int damage, Actor *owner, Actor *target);
 	int GetRangeModifier(Actor* owner, Actor* target);
 
 public :

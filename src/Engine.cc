@@ -168,6 +168,7 @@ void Engine::Run() {
 
 bool Engine::CursorOnMap() {
     if (terminal_state(TK_MOUSE_X) < map_panel.width-1) return true;
+    return false;
 };
 
 bool Engine::PickATile(int key, int *x, int *y, int max_range) {
