@@ -30,9 +30,9 @@
  * @param symbol - An integer representing the ASCII number for the actor's symbol
  * @param name - A character array with the name of the actor
  */
-Actor::Actor(int x, int y, int symbol, const char *name, Color color, int speed) :
-             x(x),y(y),symbol(symbol),name(name),ai(nullptr),
-             destructible(nullptr), attacker(nullptr), 
+Actor::Actor(int x, int y, int symbol, Color color, int speed) :
+             x(x),y(y),symbol(symbol),ai(nullptr),
+             destructible(nullptr), attacker(nullptr), words(nullptr),
              blocks(true), color(color), speed(speed), can_fly(false) {
 };
 
@@ -40,6 +40,7 @@ Actor::~Actor() {
   if ( ai ) delete ai;
   if ( destructible ) delete destructible;
   if ( attacker ) delete attacker;
+  if ( words ) delete words;
 };
 
 void Actor::Update() {

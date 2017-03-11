@@ -104,18 +104,28 @@ bool Attacker::DoesItHit(int attack_roll, int mod, Actor *target) {
 void Attacker::Message(bool hits, bool penetrates, int damage, Actor *owner, Actor *target) {
 	if (target->destructible) {
 		if ( penetrates ) {
-			engine.gui->log->Print("%s deals %d damage to %s.", 
-			                       owner->name, damage, target->name);
+		    const char* temp_word = ((owner == engine.player)? "hit" : "hits");
+			engine.gui->log->Print("%s %s %s with %s %s, dealing %d damage.", 
+			                       owner->words->Name,
+			                       temp_word,
+			                       target->words->name, 
+			                       owner->words->possessive,
+			                       owner->words->weapon.c_str(), damage);
 		} else if ( !hits ) {
-			engine.gui->log->Print("%s misses %s",
-			                       owner->name, target->name);
+			engine.gui->log->Print("%s misses %s with %s %s.",
+			                       owner->words->Name,
+			                       target->words->name, 
+			                       owner->words->possessive,
+			                       owner->words->weapon.c_str());
 		} else if ( !penetrates ) {
-			engine.gui->log->Print("%s's blow bounces off %s's armor.",
-			                       owner->name, target->name);
+			engine.gui->log->Print("%s attack bounces off %s's %s.",
+			                       owner->words->Name, owner->words->weapon.c_str(),
+			                       target->words->name, target->words->armor.c_str());
 		};
 	} else {
 		engine.gui->log->Print("%s attacks %s in vain.",
-		                       owner->name,target->name);
+		                       owner->words->Name,
+			                   target->words->name);
 	};
 };
 

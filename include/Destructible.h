@@ -26,9 +26,8 @@ public :
 	int maxHp; // maximum health points
 	int hp; // current health points
 	int armor; // strength of their armor
-	const char *corpseName; // the actor's name once dead/destroyed
 
-	Destructible(int maxHp, int armor, const char *corpseName);
+	Destructible(int maxHp, int armor);
 	inline bool isDead() { return hp <= 0; }
 	int takeDamage(Actor *owner, int damage);
 	int heal(float amount);
@@ -41,13 +40,13 @@ protected :
 
 class MonsterDestructible : public Destructible {
 public :
-	MonsterDestructible(int maxHp, int armor, const char *corpseName);
+	MonsterDestructible(int maxHp, int armor);
 	void die(Actor *owner);
 };
 
 class PlayerDestructible : public Destructible {
 public :
-	PlayerDestructible(int maxHp, int armor, const char *corpseName);
+	PlayerDestructible(int maxHp, int armor);
 	void die(Actor *owner);
 };
 #endif // INCLUDE_DESTRUCTIBLE_H_

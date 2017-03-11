@@ -49,6 +49,7 @@ class Engine {
 
  public:
   Actor* player;
+  Actor* raft;
   Map* map;
   Position* camera;
   Gui* gui;

@@ -33,6 +33,7 @@ Engine::Engine() {
   terminal_set("font: graphics/VeraMono.ttf, size=8x16");
   terminal_set("tile font: graphics/Anikki_square_16x16.bmp, size=16x16, codepage=437, align=top-left");
   terminal_set("input.filter={keyboard, mouse+}, precise-mouse=true");
+  terminal_composition(TK_ON);
   terminal_bkcolor("black");
 
   // Initialize engine state
@@ -51,11 +52,19 @@ Engine::Engine() {
   Position player_start = map->GetPlayerStart();
   camera = new Position(player_start.x, player_start.y);
   
-  player = new Actor(player_start.x, player_start.y, (int)'@', "player", Color(240,240,240), 1);
+  // Create player
+  player = new Actor(player_start.x, player_start.y, (int)'@', Color(240,240,240), 1);
+  player->words = new Words("you","You","your corpse","your","spear","robes");
   player->ai = new PlayerAi();
-  player->destructible=new PlayerDestructible(45,9,"your cadaver");
+  player->destructible=new PlayerDestructible(45,9);
   player->attacker = new Attacker(15,16,19,32);
   engine.actors.push_back(player);
+  
+  // Create raft
+  raft = new Actor(player_start.x, player_start.y-2, (int)'#', Color(139,69,19), 1);
+  raft->words = new Words("raft","Raft"," "," "," "," ");
+  raft->blocks = false;
+  engine.actors.push_front(raft);
 };
 
 Engine::~Engine() {

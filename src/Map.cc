@@ -145,14 +145,16 @@ void Map::AddMonster(int x, int y) {
    std::uniform_real_distribution<> dist(0,100);
    float roll = dist(engine.rng);
    if ( roll < 70 ) {
-        Actor *centaur = new Actor(x,y,'c',"centaur",Color(240,240,240),1);
-        centaur->destructible = new MonsterDestructible(16,0,"dead centaur");
+        Actor *centaur = new Actor(x,y,'c',Color(240,240,240),1);
+        centaur->words = new Words("the centaur","The centaur","dead centaur","his","arrow","skin");
+        centaur->destructible = new MonsterDestructible(16,0);
         centaur->attacker = new Attacker(6,9,14,150);
         centaur->ai = new MonsterAi();
         engine.actors.push_back(centaur);
     } else {
-        Actor *harpy = new Actor(x,y,'h',"harpy",Color(240,240,240),3);
-        harpy->destructible = new MonsterDestructible(26,0,"dead harpy");
+        Actor *harpy = new Actor(x,y,'h',Color(240,240,240),3);
+        harpy->words = new Words("the harpy","The harpy","dead harpy","her","claws","skin");
+        harpy->destructible = new MonsterDestructible(26,0);
         harpy->can_fly = true;
         harpy->attacker = new Attacker(14,15,12,0);
         harpy->ai = new MonsterAi();

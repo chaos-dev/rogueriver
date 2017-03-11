@@ -17,36 +17,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_ACTOR_H_
-#define INCLUDE_ACTOR_H_
-
-class Actor;
-#include "Words.h"
-#include "Ai.h"
-#include "Color.h"
-#include "Destructible.h"
-#include "Attacker.h"
-
-class Actor {
- private:
-  
- public:
-  int x, y;
-  int symbol;
-  int speed;
-  bool can_fly;
-  bool blocks;
-  Color color;
-  Words* words;
-  Ai* ai;
-  Destructible* destructible;
-  Attacker* attacker;
-  
-  Actor(int x, int y, int symbol, Color color, int speed);
-  ~Actor();
-  void Update();
-  void ProcessInput(int key, bool shift);
-  float GetDistance(int cx, int cy) const;
+#include <string>
+ 
+struct Words {
+  const char* name;
+  const char* Name;
+  const char* corpse;
+  const char* possessive;
+  std::string weapon;
+  std::string armor;
+  Words(const char* name, const char* Name, const char* corpse, 
+        const char* possessive, const char* weapon, const char* armor)
+    : name(name), Name(Name), corpse(corpse), possessive(possessive), 
+      weapon(weapon), armor(armor) {};
 };
-
-#endif /* INCLUDE_ACTOR_H_ */

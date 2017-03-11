@@ -145,8 +145,8 @@ void PlayerAi::Update(Actor *owner) {
 
   // Process any movement
   if (move) {
-    engine.game_status = Engine::NEW_TURN;
-    moveOrAttack(owner, owner->x+dx,owner->y+dy);
+    if (moveOrAttack(owner, owner->x+dx,owner->y+dy))
+      engine.game_status = Engine::NEW_TURN;
     engine.camera->x = owner->x; engine.camera->y = owner->y;
     dx = 0; dy = 0;
     move = false;
@@ -201,17 +201,26 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
   if ( engine.map->isWall(targetx,targety) ) return false;
   
   // look for living actors to attack
-  bool attacked = false;
+  bool attacking = false;
   for (Actor* actor : engine.actors) {
     if ( actor->destructible && !actor->destructible->isDead()
         && actor->x == targetx && actor->y == targety 
         && actor != engine.player) {
       owner->attacker->Attack(owner, actor, 0);
-      attacked = true;
+      attacking = true;
       targetx = owner->x;
       targety = owner->y;
       break;
     }
+  }
+
+  bool on_raft = ((engine.player->x == engine.raft->x) && 
+                  (engine.player->y == engine.raft->y));
+  bool target_is_raft = ((targetx == engine.raft->x) && 
+                         (targety == engine.raft->y));
+  if (engine.map->isWater(targetx, targety) && !on_raft && !attacking && !target_is_raft) {
+    engine.gui->log->Print("[color=flame]You need to board a raft to sail down the river.");
+    return false;
   }
 
   
@@ -229,7 +238,7 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
   }
   
   bool moved = (owner->x != temp_x || owner->y != temp_y);
-  if ((targetx != owner->x || targety != owner->y) && !moved && !attacked)
+  if ((targetx != owner->x || targety != owner->y) && !moved && !attacking)
       engine.gui->log->Print("You fight the current, but make no progress.");
   
   // look for corpses or items
@@ -239,9 +248,13 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
 	    //		    || actor->pickable;
 	    bool corpse_or_item = (actor->destructible && actor->destructible->isDead());
         if ( corpse_or_item && actor->x == owner->x && actor->y == owner->y ) {
-          engine.gui->log->Print("There's a %s here.",actor->name);
+          engine.gui->log->Print("There's a %s here.",actor->words->name);
         }
       }
+  }
+  
+  if (on_raft && engine.map->isWater(targetx, targety)) {
+    engine.raft->x = owner->x; engine.raft->y = owner->y;
   }
   
   return true;

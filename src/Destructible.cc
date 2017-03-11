@@ -23,8 +23,8 @@
 #include "Gui.h"
 #include "Engine.h"
 
-Destructible::Destructible(int maxHp, int armor, const char *corpseName) :
-	maxHp(maxHp),hp(maxHp),armor(armor),corpseName(corpseName) {
+Destructible::Destructible(int maxHp, int armor) :
+	maxHp(maxHp),hp(maxHp),armor(armor) {
 }
 
 int Destructible::takeDamage(Actor *owner, int damage) {
@@ -52,7 +52,7 @@ void Destructible::die(Actor *owner) {
 	// transform the actor into a corpse!
 	owner->symbol='%';
 	owner->color=Color(240,0,0);
-	owner->name=corpseName;
+	owner->words->name=owner->words->corpse;
 	owner->blocks=false;
 
 	// make sure corpses are drawn before living actors
@@ -62,19 +62,19 @@ void Destructible::die(Actor *owner) {
 	engine.actors.push_front(owner);
 }
 
-MonsterDestructible::MonsterDestructible(int maxHp, int armor, const char *corpseName) :
-	Destructible(maxHp,armor,corpseName) {
+MonsterDestructible::MonsterDestructible(int maxHp, int armor) :
+	Destructible(maxHp,armor) {
 }
 
 void MonsterDestructible::die(Actor *owner) {
 	// transform it into a nasty corpse! it doesn't block, can't be
 	// attacked and doesn't move
-	engine.gui->log->Print("%s is dead.", owner->name);
+	engine.gui->log->Print("%s dies!", owner->words->Name);
 	Destructible::die(owner);
 }
 
-PlayerDestructible::PlayerDestructible(int maxHp, int armor, const char *corpseName) :
-	Destructible(maxHp,armor,corpseName) {
+PlayerDestructible::PlayerDestructible(int maxHp, int armor) :
+	Destructible(maxHp,armor) {
 }
 
 void PlayerDestructible::die(Actor *owner) {
