@@ -65,10 +65,10 @@ void Engine::Init() {
   
   // Create player
   player = new Actor(player_start.x, player_start.y, (int)'@', Color(240,240,240), 1);
-  player->words = new Words("you","You","your corpse","your","spear","robes");
+  player->words = new Words("you","You","your corpse","your","sling","robes");
   player->ai = new PlayerAi();
-  player->destructible=new PlayerDestructible(45,9);
-  player->attacker = new Attacker(15,16,19,32);
+  player->destructible=new PlayerDestructible(90,2);
+  player->attacker = new Attacker(15,16,3,12);
   engine.actors.push_back(player);
   
   // Create raft

@@ -50,6 +50,8 @@ void Map::Init(bool withActors) {
                                    beach_color*(1.0-(vel/river->max_velocity));
       } else if (river->isBeach(x, y)) {
         tiles[x + y*width].color = beach_color;
+      } else if (river->isBeach(x,y-1) || river->isBeach(x,y+1)) {
+        tiles[x + y*width].color = beach_color*0.5 + bg_color*0.5;
       } else {
         tiles[x + y*width].color = bg_color;
       }
@@ -94,7 +96,7 @@ void Map::Init(bool withActors) {
     int y = (int)(dist(engine.rng)*height);
     if (!isBeach(x,y)) continue;
     
-    if (x < player.x) continue;
+    if (x < player.x || x > (engine.map->width - engine.NEXT_LEVEL_POINT)) continue;
     if ((player.x-x)*(player.x-x)+(player.y-y)*(player.y-y) < 900) continue;
     
     if (CanWalk(x,y)) {
@@ -108,7 +110,7 @@ void Map::Init(bool withActors) {
     int y = (int)(dist(engine.rng)*height);
     if (!isBeach(x,y)) continue;
     
-    if (x < player.x) continue;
+    if (x < player.x || x > (engine.map->width - engine.NEXT_LEVEL_POINT)) continue;
     if ((player.x-x)*(player.x-x)+(player.y-y)*(player.y-y) < 900) continue;
     
     if (CanWalk(x,y)) {
@@ -269,14 +271,17 @@ void Map::AddMonster(int x, int y) {
       }
       break;
     case 4:
-      if ( roll < 100 ) {
+      if ( roll < 70 ) {
+        Actor* giant = CreateMonster(MonsterType::GIANT, x, y);
+        engine.actors.push_back(giant);
+      } else {
         Actor* manticore = CreateMonster(MonsterType::MANTICORE, x, y);
         engine.actors.push_back(manticore);
       }
       break;
     case 5:
       if ( roll < 70 ) {
-        Actor* giant = CreateMonster(MonsterType::GIANT, x, y);
+        Actor* giant = CreateMonster(MonsterType::DRAGON, x, y);
         engine.actors.push_back(giant);
       } else {
         Actor* stymp = CreateMonster(MonsterType::STYMP, x, y);
@@ -387,6 +392,14 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       monster->can_fly = true;
       monster->ai = new MonsterAi();
       return monster;
+    case DRAGON:
+      monster = new Actor(x,y,'D',Color(240,240,240),1);
+      monster->words = new Words("the dragon","The dragon","dead dragon","her","fiery breath","scales");
+      monster->destructible = new MonsterDestructible(30,9);
+      monster->attacker = new Attacker(30,21,18,40);
+      monster->can_fly = true;
+      monster->ai = new MonsterAi();
+      return monster;
       
     case NESSUS:
       return nullptr;
@@ -461,25 +474,25 @@ Actor* Map::CreateItem(ItemType item_type, int x, int y) {
   switch (item_type) {
     case SHORTBOW:
       item = new Actor(x,y,')',Color(240,240,240),1);
-      item->words = new Words("short bow","Short bow"," ", " ", " "," ");
+      item->words = new Words("short bow","Short bow"," ", " ", "arrows"," ");
       item->item = new Item(5,150,0);
       return item;
       
     case JAVELIN:
       item = new Actor(x,y,'/',Color(240,240,240),1);
-      item->words = new Words("javelin", "Javelin", " ", " ", " "," ");
+      item->words = new Words("set of javelins", "Set of javelins", " ", " ", "javelin"," ");
       item->item = new Item(7,35,0);
       return item;
     
     case LONGBOW:
       item = new Actor(x,y,'}',Color(240,240,240),1);
-      item->words = new Words("longbow","Longbow"," ", " ", " "," ");
+      item->words = new Words("longbow","Longbow"," ", " ", "arrows"," ");
       item->item = new Item(9,150,0);
       return item;
       
     case ARTEMIS:
       item = new Actor(x,y,'}',Color(240,0,0),1);
-      item->words = new Words("Artemis's bow","Artemis's bow"," ", " ", " "," ");
+      item->words = new Words("Artemis's bow","Artemis's bow"," ", " ", "arrows"," ");
       item->item = new Item(20,200,0);
       return item;
       

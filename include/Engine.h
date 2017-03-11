@@ -46,6 +46,7 @@ class Engine {
   bool PickATile(int key, int *x, int *y, int max_range);
 
  public:
+  const int NEXT_LEVEL_POINT = 40;
   int level;
   Actor* player;
   Actor* raft;

@@ -211,15 +211,42 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
   
   // look for living actors to attack
   bool attacking = false;
-  for (Actor* actor : engine.actors) {
-    if ( actor->destructible && !actor->destructible->isDead()
-        && actor->x == targetx && actor->y == targety 
-        && actor != engine.player && actor != engine.raft) {
-      owner->attacker->Attack(owner, actor, -5);
-      attacking = true;
-      targetx = owner->x;
-      targety = owner->y;
-      break;
+  for (int i=0; i<engine.actors.size(); i++) {
+    Actor* actor = engine.actors[i];
+    if ( actor->x == targetx && actor->y == targety ) {
+      if (actor->destructible && !actor->destructible->isDead()
+          && actor != engine.player && actor != engine.raft) {
+        owner->attacker->Attack(owner, actor, -5);
+        attacking = true;
+        targetx = owner->x;
+        targety = owner->y;
+        break;
+      } else if (actor->item) {
+        if (actor->item->damage > owner->attacker->mean_damage) {
+          engine.gui->log->Print("[color=dark orange]You are now wielding the %s.",
+                                 actor->words->name);
+          owner->attacker->mean_damage = actor->item->damage;
+          owner->attacker->max_range = actor->item->max_range;
+          engine.actors.erase(engine.actors.begin()+i);
+          owner->words->weapon.replace(0,std::string::npos,actor->words->weapon);
+          delete actor;
+          break;
+        } else if (actor->item->damage > 0) {
+          engine.gui->log->Print("[color=yellow]You already have that weapon!");
+          break;
+        } else if (actor->item->armor > owner->destructible->armor) {
+          engine.gui->log->Print("[color=dark orange]You are now wearing the %s.",
+                                 actor->words->name);
+          owner->destructible->armor = actor->item->armor;
+          owner->words->armor.replace(0,std::string::npos,actor->words->name);
+          engine.actors.erase(engine.actors.begin()+i);
+          delete actor;
+          break;
+        } else {
+          engine.gui->log->Print("[color=yellow]You already have that armor!");
+          break;
+        }
+      }
     }
   }
 
@@ -228,7 +255,7 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
   bool target_is_raft = ((targetx == engine.raft->x) && 
                          (targety == engine.raft->y));
   if (engine.map->isWater(targetx, targety) && !on_raft && !attacking && !target_is_raft) {
-    engine.gui->log->Print("[color=flame]You need to board a raft to sail down the river.");
+    engine.gui->log->Print("[color=yellow]You need to board a raft to sail down the river.");
     return false;
   }
 
@@ -246,7 +273,7 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
     owner->y=targety + std::trunc(engine.map->GetVVelocity(owner->x, owner->y));
   }
   
-  if (owner->x > engine.map->width-40) {
+  if (owner->x > engine.map->width-engine.NEXT_LEVEL_POINT) {
     engine.NextLevel();
   };
   

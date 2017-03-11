@@ -28,7 +28,6 @@ protected:
     Actor* current_target;
     int attack;
     int dodge;
-    int mean_damage;
 	bool DoesItHit(int dice, int mod, Actor *target);
 	int GetDamage(int mean_damage, int mod, Actor* target);
 	void Message(bool hits, bool penetrates, bool dodged, int damage, Actor *owner, Actor *target);
@@ -36,6 +35,7 @@ protected:
 
 public :
     int max_range;
+    int mean_damage;
     
 	Attacker();
 	Attacker(int attack, int dodge, int mean_damage, int max_range);

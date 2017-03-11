@@ -78,6 +78,7 @@ class Map {
       CYCLOPS,
       CHIMERA,
       MANTICORE,
+      DRAGON,
       NESSUS,
       CAUCUS,
       FURY,
