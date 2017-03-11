@@ -52,6 +52,10 @@ Map::Map(int width, int height)
   while (num_enemies > 0) {
     int x = (int)(dist(engine.rng)*width);
     int y = (int)(dist(engine.rng)*height);
+    
+    Position player = GetPlayerStart();
+    if ((player.x-x)*(player.x-x)+(player.y-y)*(player.y-y) < 900) continue;
+    
     if (CanWalk(x,y)) {
         AddMonster(x,y);
         Actor* new_monster = engine.actors.back();
@@ -76,10 +80,14 @@ bool Map::isWall(int x, int y) const {
 
 bool Map::isWater(int x, int y) const {
   if (inBounds(x,y)) {
-    return (tiles.at(x+y*width).vel > 0.2);
+    return (tiles.at(x+y*width).vel > 1e-6);
   } else {
     return false;
   }
+};
+
+bool Map::isBeach(int x, int y) const {
+    return river->isBeach(x,y);
 };
 
 void Map::SetWall(int x, int y) {
@@ -92,13 +100,21 @@ bool Map::inBounds(int x, int y) const {
 
 void Map::Render(Panel panel, Position* camera) const {
   color_t corner_colors[4];
+  Color color;
   for (int term_x=panel.tl_corner.x; term_x < panel.br_corner.x; term_x++) {
     for (int term_y=panel.tl_corner.y; term_y < panel.br_corner.y; term_y++) {
       int game_x = term_x/2 + camera->x - panel.width/4;
       int game_y = height - (term_y + height-camera->y - panel.height/2);
       if (inBounds(game_x, game_y)) {
-        for (int corner = 0; corner<4; corner++)
-          corner_colors[corner] = tiles[game_x + game_y*width].color.Convert();
+        for (int corner = 0; corner<4; corner++) {
+          color = tiles[game_x + game_y*width].color;
+          if (engine.game_status == Engine::AIMING) {
+            if (engine.player->GetDistance(game_x, game_y) <= 
+                engine.player->attacker->max_range)
+              color = color*float(.9) + Color(255,255,255)*float(.1);
+          }
+          corner_colors[corner] = color.Convert();
+        }
         terminal_put_ext(term_x, term_y, 0, 0, 0x2588, corner_colors);
       }
     }

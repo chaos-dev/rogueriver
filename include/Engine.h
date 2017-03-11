@@ -35,7 +35,6 @@ class Engine {
   const int SIDEBAR_WIDTH = 40;
   int width, height;
   Panel map_panel;
-  Position* mouse;
   const int symbol = 0x2588;
   enum Status {OPEN,
                CLOSED} status;
@@ -45,13 +44,13 @@ class Engine {
   void Render();
   void RenderActor(Actor* actor);
   bool PickATile(int key, int *x, int *y, int max_range);
-  bool CursorOnMap();
 
  public:
   Actor* player;
   Actor* raft;
   Map* map;
   Position* camera;
+  Position* mouse;
   Gui* gui;
   std::deque<Actor*> actors;
   std::mt19937 rng;  // Random number generator
@@ -67,6 +66,7 @@ class Engine {
   Engine();
   ~Engine();
   void Run();
+  bool CursorOnMap();
 };
 
 extern Engine engine;

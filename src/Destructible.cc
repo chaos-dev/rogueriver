@@ -50,8 +50,6 @@ int Destructible::heal(float amount) {
 
 void Destructible::die(Actor *owner) {
 	// transform the actor into a corpse!
-	owner->symbol='%';
-	owner->color=Color(240,0,0);
 	owner->words->name=owner->words->corpse;
 	owner->blocks=false;
 
@@ -70,6 +68,8 @@ void MonsterDestructible::die(Actor *owner) {
 	// transform it into a nasty corpse! it doesn't block, can't be
 	// attacked and doesn't move
 	engine.gui->log->Print("%s dies!", owner->words->Name);
+    owner->symbol='%';
+	owner->color=Color(136,13,3);
 	Destructible::die(owner);
 }
 
@@ -78,12 +78,26 @@ PlayerDestructible::PlayerDestructible(int maxHp, int armor) :
 }
 
 void PlayerDestructible::die(Actor *owner) {
-	engine.gui->log->Print("[color=red]You died!");
+	engine.gui->log->Print("[color=flame]You died!");
+	owner->symbol='%';
+	owner->color=Color(136,13,3);
 	Destructible::die(owner);
 	// make sure your corpse is on top
 	for (unsigned int i=0; i<engine.actors.size(); i++) {
 	    if (engine.actors[i] == owner) engine.actors.erase(engine.actors.begin()+i);
 	}
 	engine.actors.push_back(owner);
+	engine.game_status=Engine::DEFEAT;
+}
+
+RaftDestructible::RaftDestructible(int maxHp, int armor) :
+	Destructible(maxHp,armor) {
+}
+
+void RaftDestructible::die(Actor *owner) {
+	engine.gui->log->Print("Your raft is destroyed!");
+	owner->symbol='=';
+	owner->color=Color(139,69,19);
+	Destructible::die(owner);
 	engine.game_status=Engine::DEFEAT;
 }

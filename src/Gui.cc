@@ -21,17 +21,17 @@
 #include <stdarg.h>
 #include <algorithm>
 #include <iostream>
+#include <string.h>
 
+#include "Engine.h"
 #include "BearLibTerminal.h"
 
 Log::Log(int sidebar_width) : sidebar_width(sidebar_width), duplicate_count(1) {
   Reset();
   const std::string prompt =
-      "Use the scrollbar or a mouse scrollwheel to move the log.";
+      "Midway upon the journey of your life, you find yourself within a forest dark...";
   messages.push_back(Message(prompt));
   Print("----------------------------------");
-  Print("Midway upon the journey of your life, you find yourself within a forest dark...");
-  Print(" ");
   UpdateGeometry();
 };
 
@@ -218,14 +218,111 @@ void Gui::ProcessInput(int key) {
 }
 
 void Gui::Render() {
+  int sidebar_start = terminal_state(TK_WIDTH) - sidebar_width;
+  
+  terminal_layer(0);
+  terminal_bkcolor("darkest gray");
+  terminal_clear_area(sidebar_start+1,1,sidebar_width-2,11);
+  terminal_layer(2);
+  terminal_print(sidebar_start+12, 1, "[color=dark orange]River: Acheron");
+
+  // Help tip
+  RenderHelp(sidebar_start+2,3);
+
+  RenderMouseLook(sidebar_start+2, 7);
+  
+  // health bar
+  RenderBar(sidebar_start+1, 13, sidebar_width-2, 7, "Health",
+            engine.player->destructible->hp,
+            engine.player->destructible->maxHp,Color(136,13,3),Color(106,7,3));
+            
+  // raft integrity
+  RenderBar(sidebar_start+1, 15, sidebar_width-2, 12, "Raft Integrity:",
+            engine.raft->destructible->hp,
+            engine.raft->destructible->maxHp,Color(129,76,42),Color(73,39,14));
+  
   log->Render();
+  
+  terminal_bkcolor("black");
 }
 
-void Gui::RenderBar(int x, int y, int width, const char *name,
+void Gui::RenderBar(int x, int y, int width, int offset, const char *name,
 		            float value, float maxValue, const Color barColor,
 		            const Color backColor) {
-
+  int block_symbol = 0x2588;
+  // Fill in the background.
+  terminal_layer(0);
+  terminal_bkcolor(backColor.Convert());
+  terminal_clear_area(x,y,width,1);
+  terminal_bkcolor("none");
+  
+  // Fill in the bar
+  terminal_layer(6);
+  int bar_width = (int)(value / maxValue * width);
+  if (bar_width > 0) {
+    terminal_color(barColor.Convert());
+    for (int i=0; i<bar_width; i++) terminal_put(x+i, y, block_symbol);
+  }
+  
+  // Print the text on top of the bar
+  terminal_layer(7);
+  terminal_color("white");
+  terminal_printf(x+width/2-offset, y, "%s : %g/%g", name, value, maxValue);
+  
+  // Put the colors back to their defaults.
+  terminal_bkcolor("black");
 }
 
-void RenderMouseLook() {
+void Gui::RenderMouseLook(int x, int y) {
+  if (engine.CursorOnMap()) {
+    char buf[128]=" ";
+    bool first=true;
+    for (Actor* actor : engine.actors) {
+      if (actor->x == engine.mouse->x && actor->y == engine.mouse->y) {
+        if (first) {
+          first = false;
+        } else {
+          strcat(buf, ", ");
+        };
+        strcat(buf, actor->words->name);
+      };
+    };
+    terminal_printf(x, y, "Cursor X: %d  Y: %d", engine.mouse->x, engine.mouse->y);
+    terminal_printf(x, y+1, "Under cursor:");
+    
+    // Check the terrain
+    if (engine.map->isWater(engine.mouse->x, engine.mouse->y)) {
+        terminal_printf(x, y+2, " river with speed: [[%4.1f, %4.1f]] m/s",
+                        engine.map->GetUVelocity(engine.mouse->x, engine.mouse->y),
+                        engine.map->GetVVelocity(engine.mouse->x, engine.mouse->y));
+    } else if (engine.map->isBeach(engine.mouse->x, engine.mouse->y)) {
+        terminal_printf(x, y+2, " riverside");
+    } else {
+        terminal_printf(x, y+2, " grass");
+    }
+    
+    // Print the actors
+    terminal_print_ext(x, y+3, sidebar_width-4, 0, TK_ALIGN_DEFAULT, buf);
+    
+
+  }
+  
+};
+
+void Gui::RenderHelp(int x, int y) {
+
+  if (engine.game_status == Engine::AIMING) {
+    terminal_color("yellow");
+    terminal_print_ext(x, y, sidebar_width-4, 0, TK_ALIGN_DEFAULT, 
+                       "Click any square to aim, or press spacebar to cancel.");
+    if (engine.CursorOnMap()) {
+        terminal_printf(x,y+2,"That space is %.0f m away.\nYour max range is %d.",
+                        engine.player->GetDistance(engine.mouse->x, engine.mouse->y),
+                        engine.player->attacker->max_range);
+    }
+    terminal_color("white");
+  } else {
+    terminal_print_ext(x, y, sidebar_width-4, 0, TK_ALIGN_DEFAULT, 
+                       "Press the arrow/numpad/vi keys to move, or press 'f' to fire.");
+  };
 };

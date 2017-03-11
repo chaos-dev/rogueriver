@@ -184,7 +184,6 @@ void PlayerAi::ProcessInput(Actor *owner, int key, bool shift) {
     dx = 0; dy = 0; move = true;
   } else if (key == TK_F && !shift) {
     engine.game_status = Engine::AIMING;
-    engine.gui->log->Print("Click any square to aim, or press spacebar to cancel.");
   } else if (key == TK_R && !shift) {
     if (running) {
       running = false;
@@ -215,7 +214,7 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
   for (Actor* actor : engine.actors) {
     if ( actor->destructible && !actor->destructible->isDead()
         && actor->x == targetx && actor->y == targety 
-        && actor != engine.player) {
+        && actor != engine.player && actor != engine.raft) {
       owner->attacker->Attack(owner, actor, -5);
       attacking = true;
       targetx = owner->x;

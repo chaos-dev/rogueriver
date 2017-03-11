@@ -61,8 +61,9 @@ Engine::Engine() {
   engine.actors.push_back(player);
   
   // Create raft
-  raft = new Actor(player_start.x, player_start.y-2, (int)'#', Color(139,69,19), 1);
-  raft->words = new Words("raft","Raft"," "," "," "," ");
+  raft = new Actor(player_start.x, player_start.y-2, (int)'#', Color(129,76,42), 1);
+  raft->words = new Words("raft","Raft","pile of logs"," "," ","thick wood");
+  raft->destructible = new RaftDestructible(45,9);
   raft->blocks = false;
   engine.actors.push_front(raft);
 };
@@ -105,20 +106,6 @@ void Engine::Render() {
   };
   
   // Gui
-  terminal_layer(0);
-  terminal_bkcolor("darkest gray");
-  terminal_clear_area(terminal_state(TK_WIDTH)-SIDEBAR_WIDTH+1,1,terminal_state(TK_WIDTH)-1,10);
-  terminal_layer(2);
-  terminal_print(width-SIDEBAR_WIDTH+1, 2, "River: Acheron");
-  terminal_printf(width-SIDEBAR_WIDTH+1, 4, "Player X: %d  Y: %d", player->x, player->y);
-  if (CursorOnMap()) {
-      terminal_printf(width-SIDEBAR_WIDTH+1, 6, "Cursor X: %d  Y: %d", mouse->x, mouse->y);
-      terminal_printf(width-SIDEBAR_WIDTH+1, 8, "River Velocity Under Cursor:");
-      terminal_printf(width-SIDEBAR_WIDTH+1, 9, "    [[%.1f, %.1f]] m/s",
-                      map->GetUVelocity(mouse->x, mouse->y),
-                      map->GetVVelocity(mouse->x, mouse->y));
-  };
-  terminal_bkcolor("black");
   gui->Render();
 
   // Print out results

@@ -39,10 +39,10 @@ struct Message {
 class Log {
  private:
   const int sidebar_width;
-  const int padding_left = 2;
-  const int padding_right = 2;
-  const int padding_top = 16;
-  const int padding_bottom = 2;
+  const int padding_left = 1;
+  const int padding_right = 1;
+  const int padding_top = 17;
+  const int padding_bottom = 1;
   const int mouse_scroll_step = 2; // 2 text rows per mouse wheel step.
   const int line_padding = 0;
   int sidebar_start;
@@ -74,10 +74,11 @@ class Log {
 class Gui {
  private:
   const int sidebar_width;
-  void RenderBar(int x, int y, int width, const char *name,
+  void RenderBar(int x, int y, int width, int offset, const char *name,
 		         float value, float maxValue, const Color barColor,
 		         const Color backColor);
-  void RenderMouseLook();
+  void RenderMouseLook(int x, int y);
+  void RenderHelp(int x, int y);
  public:
   Log* log;
   Gui(int sidebar_width);
