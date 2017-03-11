@@ -85,6 +85,7 @@ void PlayerDestructible::die(Actor *owner) {
 	// make sure your corpse is on top
 	for (unsigned int i=0; i<engine.actors.size(); i++) {
 	    if (engine.actors[i] == owner) engine.actors.erase(engine.actors.begin()+i);
+	    break;
 	}
 	engine.actors.push_back(owner);
 	engine.game_status=Engine::DEFEAT;
@@ -100,4 +101,18 @@ void RaftDestructible::die(Actor *owner) {
 	owner->color=Color(139,69,19);
 	Destructible::die(owner);
 	engine.game_status=Engine::DEFEAT;
+}
+
+GhostDestructible::GhostDestructible(int maxHp, int armor) :
+	Destructible(maxHp,armor) {
+}
+
+void GhostDestructible::die(Actor *owner) {
+	engine.gui->log->Print("%s shrieks and fades away.", owner->words->Name);
+	for (unsigned int i=0; i<engine.actors.size(); i++) {
+	    if (engine.actors[i] == owner) {
+	        engine.actors.erase(engine.actors.begin()+i);
+	        break;
+	    }
+	}
 }

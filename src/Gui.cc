@@ -316,21 +316,37 @@ void Gui::RenderMouseLook(int x, int y) {
     terminal_printf(x, y+1, "Under cursor:");
     
     // Check the terrain
-    if (engine.map->isWater(engine.mouse->x, engine.mouse->y)) {
-        terminal_printf(x, y+2, " river with speed: [[%4.1f, %4.1f]] m/s",
-                        engine.map->GetUVelocity(engine.mouse->x, engine.mouse->y),
-                        engine.map->GetVVelocity(engine.mouse->x, engine.mouse->y));
-    } else if (engine.map->isBeach(engine.mouse->x, engine.mouse->y)) {
-        terminal_printf(x, y+2, " riverside");
+  if (engine.map->isWater(engine.mouse->x, engine.mouse->y)) {
+    if (engine.level == 5) {
+      terminal_printf(x, y+2, " blood with speed: [[%4.1f, %4.1f]] m/s",
+                      engine.map->GetUVelocity(engine.mouse->x, engine.mouse->y),
+                      engine.map->GetVVelocity(engine.mouse->x, engine.mouse->y));
     } else {
-        terminal_printf(x, y+2, " grass");
+      terminal_printf(x, y+2, " river with speed: [[%4.1f, %4.1f]] m/s",
+                      engine.map->GetUVelocity(engine.mouse->x, engine.mouse->y),
+                      engine.map->GetVVelocity(engine.mouse->x, engine.mouse->y));
+    };
+  } else if (engine.map->isBeach(engine.mouse->x, engine.mouse->y)) {
+    if (engine.level <= 2) {
+      terminal_printf(x, y+2, " sand");
+    } else {
+      terminal_printf(x, y+2, " gravel");
     }
-    
-    // Print the actors
-    terminal_print_ext(x, y+3, sidebar_width-4, 0, TK_ALIGN_DEFAULT, buf);
-    
-
+  } else {
+    if (engine.level <= 2) {
+      terminal_printf(x, y+2, " grass");
+    } else if (engine.level == 3) {
+      terminal_printf(x, y+2, " dead grass");
+    } else {
+      terminal_printf(x, y+2, " rock");
+    }
   }
+
+// Print the actors
+terminal_print_ext(x, y+3, sidebar_width-4, 0, TK_ALIGN_DEFAULT, buf);
+
+
+}
   
 };
 

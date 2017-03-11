@@ -56,7 +56,7 @@ void Map::Init(bool withActors) {
     }
   }
   std::uniform_real_distribution<> dist(0,1);
-  int num_enemies = (int)dist(engine.rng)*20;
+  int num_enemies = (int)(dist(engine.rng)*20+40);
   while (num_enemies > 0) {
     int x = (int)(dist(engine.rng)*width);
     int y = (int)(dist(engine.rng)*height);
@@ -197,24 +197,170 @@ bool Map::CanWalk(int x, int y) const {
 }
 
 void Map::AddMonster(int x, int y) {
-   std::uniform_real_distribution<> dist(0,100);
-   float roll = dist(engine.rng);
-   if ( roll < 70 ) {
-        Actor *centaur = new Actor(x,y,'c',Color(240,240,240),1);
-        centaur->words = new Words("the centaur","The centaur","dead centaur","his","arrow","skin");
-        centaur->destructible = new MonsterDestructible(16,0);
-        centaur->attacker = new Attacker(6,9,14,150);
-        centaur->ai = new MonsterAi();
+  std::uniform_int_distribution<> dist(0,100);
+  int roll = dist(engine.rng);
+  switch (engine.level) {
+    case 1:
+      if ( roll < 90 ) {
+        Actor* ghost = CreateMonster(MonsterType::GHOST, x, y);
+        engine.actors.push_back(ghost);
+      } else {
+        Actor* cyclops = CreateMonster(MonsterType::CYCLOPS, x, y);
+        engine.actors.push_back(cyclops);
+      }
+      break;
+    case 2:
+      if ( roll < 70 ) {
+        Actor* centaur = CreateMonster(MonsterType::CENTAUR, x, y);
         engine.actors.push_back(centaur);
-    } else {
-        Actor *harpy = new Actor(x,y,'h',Color(240,240,240),3);
-        harpy->words = new Words("the harpy","The harpy","dead harpy","her","claws","skin");
-        harpy->destructible = new MonsterDestructible(26,0);
-        harpy->can_fly = true;
-        harpy->attacker = new Attacker(14,15,12,0);
-        harpy->ai = new MonsterAi();
+      } else {
+        Actor* skeleton = CreateMonster(MonsterType::SKELETON, x, y);
+        engine.actors.push_back(skeleton);
+      }
+      break;
+    case 3:
+      if ( roll < 80 ) {
+        Actor* ghoul = CreateMonster(MonsterType::GHOUL, x, y);
+        engine.actors.push_back(ghoul);
+      } else {
+        Actor* harpy = CreateMonster(MonsterType::HARPY, x, y);
         engine.actors.push_back(harpy);
-    }
+      }
+      break;
+    case 4:
+      if ( roll < 100 ) {
+        Actor* manticore = CreateMonster(MonsterType::MANTICORE, x, y);
+        engine.actors.push_back(manticore);
+      }
+      break;
+    case 5:
+      if ( roll < 70 ) {
+        Actor* giant = CreateMonster(MonsterType::GIANT, x, y);
+        engine.actors.push_back(giant);
+      } else {
+        Actor* stymp = CreateMonster(MonsterType::STYMP, x, y);
+        engine.actors.push_back(stymp);
+      }
+      break;
+    default:
+      break;
+  };
+};
+
+Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
+  std::uniform_int_distribution<> dist(0,100);
+  int roll = dist(engine.rng);
+  Actor* monster = nullptr;
+  switch (monster_type) {
+    case GHOST:
+      monster = new Actor(x,y,'g',Color(198,198,198),1);
+      switch (roll%4) {
+        case 0:
+          monster->words = new Words("the ghost","The ghost","dead ghost","his","arrow","shadowy form");
+          monster->attacker = new Attacker(6,6,8,150);
+          break;
+        case 1:
+          monster->words = new Words("the ghost","The ghost","dead ghost","his","javelin","shadowy form");
+          monster->attacker = new Attacker(6,6,6,32);
+          break;
+        case 2:
+          monster->words = new Words("the ghost","The ghost","dead ghost","his","sling","shadowy form");
+          monster->attacker = new Attacker(6,6,3,12);
+          break;
+        default:
+          monster->words = new Words("the ghost","The ghost","dead ghost","his","sword","shadowy form");
+          monster->attacker = new Attacker(6,6,5,1);
+        break;
+      }
+      if (roll%2 == 0) monster->words->possessive = "her";
+      monster->destructible = new GhostDestructible(1,0);
+      monster->ai = new MonsterAi();
+      monster->can_fly = true;
+      return monster;
+      
+    case SKELETON:
+      monster = new Actor(x,y,'s',Color(240,240,240),1);
+      monster->words = new Words("the skeleton","The skeleton","pile of bones","his","sword","bones");
+      if (roll%2 == 0) monster->words->possessive = "her";
+      monster->destructible = new MonsterDestructible(12,0);
+      monster->attacker = new Attacker(6,6,11,1);
+      monster->ai = new MonsterAi();
+      return monster;
+      
+    case GHOUL:
+      monster = new Actor(x,y,'s',Color(240,240,240),1);
+      monster->words = new Words("the ghoul","The ghoul","pile of bones","his","acidic blood","bones");
+      if (roll%2 == 0) monster->words->possessive = "her";
+      monster->destructible = new MonsterDestructible(19,0);
+      monster->attacker = new Attacker(7,12,9,12);
+      monster->ai = new MonsterAi();
+      return monster;
+    
+    case CENTAUR:
+      monster = new Actor(x,y,'c',Color(240,240,240),2);
+      monster->words = new Words("the centaur","The centaur","dead centaur","his","arrow","skin");
+      monster->destructible = new MonsterDestructible(16,0);
+      monster->attacker = new Attacker(6,9,14,150);
+      monster->ai = new MonsterAi();
+      return monster;
+      
+    case HARPY:
+      monster = new Actor(x,y,'h',Color(240,240,240),3);
+      monster->words = new Words("the harpy","The harpy","dead harpy","her","claws","skin");
+      monster->destructible = new MonsterDestructible(26,0);
+      monster->can_fly = true;
+      monster->attacker = new Attacker(14,15,12,1);
+      monster->ai = new MonsterAi();
+      return monster;
+      
+    case STYMP:
+      monster = new Actor(x,y,'v',Color(240,240,240),4);
+      monster->words = new Words("the stymphalian bird","The stymphalian bird","dead stymphalian bird","his","bronze beak","metal feathers");
+      monster->destructible = new MonsterDestructible(21,6);
+      monster->can_fly = true;
+      monster->attacker = new Attacker(15,9,15,1);
+      monster->ai = new MonsterAi();
+      return monster;
+      
+    case GIANT:
+      monster = new Actor(x,y,'G',Color(240,240,240),2);
+      monster->words = new Words("the giant","The giant","dead giant","his","boulder","fur coat");
+      monster->destructible = new MonsterDestructible(32,2);
+      monster->attacker = new Attacker(10,3,25,12);
+      monster->ai = new MonsterAi();
+      return monster;
+    
+    case CYCLOPS:
+      monster = new Actor(x,y,'C',Color(240,240,240),1);
+      monster->words = new Words("the cyclops","The cyclops","dead cyclops","his","massive club","skin");
+      monster->destructible = new MonsterDestructible(26,0);
+      monster->attacker = new Attacker(7,3,20,1);
+      monster->ai = new MonsterAi();
+      return monster;
+      
+    case MANTICORE:
+      monster = new Actor(x,y,'M',Color(240,240,240),3);
+      monster->words = new Words("the manticore","The manticore","dead manticore","his","spines shot from its tail","thick hide");
+      monster->destructible = new MonsterDestructible(22,3);
+      monster->attacker = new Attacker(15,11,9,15);
+      monster->can_fly = true;
+      monster->ai = new MonsterAi();
+      return monster;
+      
+    case NESSUS:
+      return nullptr;
+    case CHIMERA:
+      return nullptr;
+    case CAUCUS:
+      return nullptr;
+    case FURY:
+      return nullptr;
+    case CHARYBDIS:
+      return nullptr;
+    case CERBERUS:
+      return nullptr;
+  }
+  return monster;
 };
 
 void Map::AddItem(int x, int y) {

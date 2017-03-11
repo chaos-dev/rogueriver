@@ -55,4 +55,10 @@ public :
 	RaftDestructible(int maxHp, int armor);
 	void die(Actor *owner);
 };
+
+class GhostDestructible : public Destructible {
+public :
+	GhostDestructible(int maxHp, int armor);
+	void die(Actor *owner);
+};
 #endif // INCLUDE_DESTRUCTIBLE_H_

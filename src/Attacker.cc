@@ -184,6 +184,8 @@ bool Attacker::InRange(Actor* owner, Actor* target) {
   float distance = owner->GetDistance(target->x, target->y);
   if (max_range <= 1) {
     return false;
+  } else if (distance > 70) {
+    return false;
   } else if (distance <= 3) {
     return true;
   } else if (target->attacker) {

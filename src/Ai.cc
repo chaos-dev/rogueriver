@@ -108,7 +108,7 @@ void MonsterAi::moveOrAttack(Actor *owner, int targetx, int targety) {
                    (!engine.map->isWater(owner->x,owner->y+stepdy) || 
                    owner->can_fly)) {
           owner->y += stepdy;
-        } else if ( distance < std::min(owner->attacker->max_range,100) ) {
+        } else if ( distance < std::min(owner->attacker->max_range,70) ) {
           owner->attacker->SetAim(engine.player);
           owner->attacker->UpdateFiring(owner);
         }

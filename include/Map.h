@@ -22,6 +22,7 @@
 
 #include "River.h"
 #include "Color.h"
+#include "Actor.h"
 
 #include "BearLibTerminal.h"
 
@@ -65,6 +66,24 @@ class Map {
   bool inBounds(int x, int y) const;
   void SetColors();
  public:
+   enum MonsterType {
+      GHOST,
+      SKELETON,
+      GHOUL,
+      CENTAUR,
+      HARPY,
+      STYMP,
+      GIANT,
+      CYCLOPS,
+      CHIMERA,
+      MANTICORE,
+      NESSUS,
+      CAUCUS,
+      FURY,
+      CHARYBDIS,
+      CERBERUS
+  };
+  Actor* CreateMonster(MonsterType monster_type, int x, int y);
   int width, height;
   Position camera;
 
