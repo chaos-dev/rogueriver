@@ -42,5 +42,6 @@ public :
 	void Attack(Actor *owner, Actor *target, int mod);
 	void SetAim(Actor* target);
 	bool UpdateFiring(Actor* owner);
+	bool InRange(Actor* owner, Actor* target);
 };
 #endif // INCLUDE_ATTACKER_H_

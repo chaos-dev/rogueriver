@@ -112,15 +112,18 @@ void Attacker::Message(bool hits, bool penetrates, int damage, Actor *owner, Act
 			                       owner->words->possessive,
 			                       owner->words->weapon.c_str(), damage);
 		} else if ( !hits ) {
-			engine.gui->log->Print("%s misses %s with %s %s.",
-			                       owner->words->Name,
+		    const char* temp_word = ((owner == engine.player)? "miss" : "misses");
+			engine.gui->log->Print("%s %s %s with %s %s.",
+			                       owner->words->Name, temp_word,
 			                       target->words->name, 
 			                       owner->words->possessive,
 			                       owner->words->weapon.c_str());
 		} else if ( !penetrates ) {
-			engine.gui->log->Print("%s attack bounces off %s's %s.",
-			                       owner->words->Name, owner->words->weapon.c_str(),
-			                       target->words->name, target->words->armor.c_str());
+		    const char* temp_word = ((owner == engine.player)? "r" : "'s");
+			engine.gui->log->Print("%s attack bounces off %s %s %s.",
+			                       owner->words->Name,
+			                       target->words->name, temp_word, 
+			                       target->words->armor.c_str());
 		};
 	} else {
 		engine.gui->log->Print("%s attacks %s in vain.",
@@ -147,9 +150,6 @@ int Attacker::GetRangeModifier(Actor* owner, Actor* target) {
         float distance = owner->GetDistance(target->x, target->y);
         int modifier = int(15.0*std::log(distance)/
                            std::log(float(owner->attacker->max_range)) - 5.0);
-#ifndef NDEBUG
-        engine.gui->log->Print("[color=grey]The range modifier was: %d", modifier);
-#endif
         return modifier;
     };
         
@@ -166,6 +166,21 @@ bool Attacker::UpdateFiring(Actor* owner) {
     Attack(owner, current_target, mod);
     firing = false;
     return true;
+  }
+  return false;
+};
+
+bool Attacker::InRange(Actor* owner, Actor* target) {
+  float distance = owner->GetDistance(target->x, target->y);
+  if (max_range <= 1) {
+    return false;
+  } else if (distance <= 3) {
+    return true;
+  } else if (target->attacker) {
+    int modifier = GetRangeModifier(owner, target);
+    if (target->attacker->dodge + modifier < owner->attacker->attack) {
+        return true;
+    }
   }
   return false;
 };

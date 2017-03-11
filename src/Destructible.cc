@@ -80,5 +80,10 @@ PlayerDestructible::PlayerDestructible(int maxHp, int armor) :
 void PlayerDestructible::die(Actor *owner) {
 	engine.gui->log->Print("You died!");
 	Destructible::die(owner);
+	// make sure your corpse is on top
+	for (unsigned int i=0; i<engine.actors.size(); i++) {
+	    if (engine.actors[i] == owner) engine.actors.erase(engine.actors.begin()+i);
+	}
+	engine.actors.push_back(owner);
 	engine.game_status=Engine::DEFEAT;
 }

@@ -29,8 +29,8 @@ class River {
   int length;
   float min_width = 15;
   float max_width = 40;
-  float min_travel = 40;
-  float max_travel = 80;
+  float min_travel = 30;
+  float max_travel = 90;
   int num_periods = 3;
   std::vector<float> width;
   std::vector<float> shape;

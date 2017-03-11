@@ -63,7 +63,13 @@ void MonsterAi::ProcessInput(Actor *owner, int key, bool shift) {
  */
 void MonsterAi::Update(Actor *owner) {
   if (isActive(owner)) {
-    moveOrAttack(owner, engine.player->x,engine.player->y);
+    if (owner->attacker && owner->attacker->InRange(owner, engine.player) &&
+        !engine.player->destructible->isDead()) {
+        owner->attacker->SetAim(engine.player);
+        owner->attacker->UpdateFiring(owner);
+    } else {
+      moveOrAttack(owner, engine.player->x,engine.player->y);
+    }
   }
 }
 
@@ -101,9 +107,12 @@ void MonsterAi::moveOrAttack(Actor *owner, int targetx, int targety) {
                    (!engine.map->isWater(owner->x,owner->y+stepdy) || 
                    owner->can_fly)) {
           owner->y += stepdy;
+        } else if ( distance < std::min(owner->attacker->max_range,100) ) {
+          owner->attacker->SetAim(engine.player);
+          owner->attacker->UpdateFiring(owner);
         }
       } else if ( owner->attacker && i<(owner->speed)) {
-        owner->attacker->Attack(owner,engine.player,0);
+        owner->attacker->Attack(owner,engine.player,-5);
         break;
       }
    }
@@ -206,7 +215,7 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
     if ( actor->destructible && !actor->destructible->isDead()
         && actor->x == targetx && actor->y == targety 
         && actor != engine.player) {
-      owner->attacker->Attack(owner, actor, 0);
+      owner->attacker->Attack(owner, actor, -5);
       attacking = true;
       targetx = owner->x;
       targety = owner->y;

@@ -29,8 +29,8 @@ River::River(int length) : length(length) {
   mean_velocity.resize(length);
 
   // Create the river
-  width = RandomSignal(length, min_width, max_width, length/2.0, length*2.0, num_periods);
-  shape = RandomSignal(length, min_travel, max_travel, length/3.0, length*2.0, num_periods);
+  width = RandomSignal(length, min_width, max_width, 200, length*2.0, num_periods);
+  shape = RandomSignal(length, min_travel, max_travel, 150, length*2.0, num_periods);
   
   // Create the angle of the river
   angle[0] = std::tan(shape[1] - shape[0]);
