@@ -28,6 +28,7 @@ class Actor;
  */
 class Ai {
 public :
+    ~Ai() {};
 	virtual void Update(Actor *owner)=0;
 	virtual void ProcessInput(Actor *owner, int key, bool shift)=0;
 	virtual bool isActive(Actor *owner) = 0;

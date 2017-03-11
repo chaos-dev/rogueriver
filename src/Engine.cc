@@ -202,8 +202,10 @@ void Engine::NextLevel() {
   delete map;
   
   // delete all actors but the player and the raft
-  for (Actor* actor : actors) {
-    if (actor != player && actor != raft) {
+  for (unsigned int i=0; i<actors.size(); i++) {
+    if (actors[i] != player && actors[i] != raft) {
+      actors.erase(actors.begin()+i);
+      i--;
     };
   };
   

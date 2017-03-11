@@ -56,7 +56,7 @@ void Map::Init(bool withActors) {
     }
   }
   std::uniform_real_distribution<> dist(0,1);
-  int num_enemies = (int)dist(engine.rng)*20+40;
+  int num_enemies = (int)dist(engine.rng)*20;
   while (num_enemies > 0) {
     int x = (int)(dist(engine.rng)*width);
     int y = (int)(dist(engine.rng)*height);
@@ -85,9 +85,24 @@ void Map::SetColors() {
       bg_color.Update(91,135,20);
       break;
     case 2:
-      water_color.Update(4,69,143);
-      beach_color.Update(166,157,123);
-      bg_color.Update(91,135,20);
+      water_color.Update(23,61,64);
+      beach_color.Update(127,128,132);
+      bg_color.Update(83,108,76);
+      break;
+    case 3:
+      water_color.Update(23,61,64);
+      beach_color.Update(117,122,100);
+      bg_color.Update(71,51,40);
+      break;
+    case 4:
+      water_color.Update(23,61,64);
+      beach_color.Update(107,83,49);
+      bg_color.Update(50,36,23);
+      break;
+    case 5:
+      water_color.Update(92,10,12);
+      bg_color.Update(24,12,14);
+      beach_color.Update(59,64,60);
       break;
     default:
       break;
