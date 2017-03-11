@@ -62,6 +62,7 @@ class Log {
   void UpdateGeometry();
   void ScrollToPixel(int py);
   int duplicate_count;
+
  public:
   Log(int sidebar_width);
   void Print(const char* message, ...);
@@ -80,6 +81,7 @@ class Gui {
 		         const Color backColor);
   void RenderMouseLook(int x, int y);
   void RenderHelp(int x, int y);
+  const char* GetTitle();
  public:
   Log* log;
   Gui(int sidebar_width);

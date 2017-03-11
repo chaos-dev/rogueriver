@@ -221,6 +221,25 @@ void Gui::ProcessInput(int key) {
   log->ProcessInput(key);
 }
 
+const char* Gui::GetTitle() {
+  switch (engine.level) {
+    case 1:
+      return "[color=dark orange]Acheron: River of Pain";
+      break;
+    case 2:
+      return "[color=dark orange]Cocytus: River of Wailing";
+    case 3:
+      return "[color=dark orange]Lethe: River of Forgetfulness";
+    case 4:
+      return "[color=dark orange]Styx: River of Hatred";
+    case 5:
+      return "[color=dark orange]Phlegethon: River of Fire";
+      break;
+    default:
+      return "ERROR: TITLE NOT FOUND";
+  };
+};
+
 void Gui::Render() {
   int sidebar_start = terminal_state(TK_WIDTH) - sidebar_width;
   
@@ -228,7 +247,9 @@ void Gui::Render() {
   terminal_bkcolor("darkest gray");
   terminal_clear_area(sidebar_start+1,1,sidebar_width-2,11);
   terminal_layer(2);
-  terminal_print(sidebar_start+12, 1, "[color=dark orange]River: Acheron");
+  const char* title = GetTitle();
+  terminal_print_ext(sidebar_start+1,1, sidebar_width-4, 0, TK_ALIGN_CENTER,
+                     title);
 
   // Help tip
   RenderHelp(sidebar_start+2,3);

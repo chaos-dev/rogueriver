@@ -246,6 +246,10 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
     owner->y=targety + std::trunc(engine.map->GetVVelocity(owner->x, owner->y));
   }
   
+  if (owner->x > engine.map->width-40) {
+    engine.NextLevel();
+  };
+  
   bool moved = (owner->x != temp_x || owner->y != temp_y);
   if ((targetx != owner->x || targety != owner->y) && !moved && !attacking)
       engine.gui->log->Print("You fight the current, but make no progress.");
