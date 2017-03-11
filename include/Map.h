@@ -60,7 +60,8 @@ class Map {
   std::vector<Tile> tiles;
   River* river;
   void AddMonster(int x, int y);
-  void AddItem(int x, int y);
+  void AddWeapon(int x, int y);
+  void AddArmor(int x, int y);
   
   void SetWall(int x, int y);
   bool inBounds(int x, int y) const;

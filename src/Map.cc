@@ -55,13 +55,15 @@ void Map::Init(bool withActors) {
       }
     }
   }
+  
+  Position player = GetPlayerStart();
+  
   std::uniform_real_distribution<> dist(0,1);
   int num_enemies = (int)(dist(engine.rng)*20);
   while (num_enemies > 0) {
     int x = (int)(dist(engine.rng)*width);
     int y = (int)(dist(engine.rng)*height);
     
-    Position player = GetPlayerStart();
     if ((player.x-x)*(player.x-x)+(player.y-y)*(player.y-y) < 900) continue;
     
     if (CanWalk(x,y)) {
@@ -75,19 +77,43 @@ void Map::Init(bool withActors) {
         }
     };
   };
-  
-  int num_items = (int)(dist(engine.rng)*4+3);
-  while (num_items > 0) {
+
+  int num_armor; int num_weapons;
+  if (engine.level == 4) {
+    num_armor = 1; num_weapons = 1;
+  } else if (engine.level == 5) {
+    num_armor = 0; num_weapons = 0;
+  } else {
+    num_armor = (int)(dist(engine.rng)*2+1);
+    num_weapons = (int)(dist(engine.rng)*2+1);
+  }
+
+  if (engine.level > 3) num_weapons = 1;
+  while (num_weapons > 0) {
     int x = (int)(dist(engine.rng)*width);
     int y = (int)(dist(engine.rng)*height);
     if (!isBeach(x,y)) continue;
     
-    Position player = GetPlayerStart();
+    if (x < player.x) continue;
     if ((player.x-x)*(player.x-x)+(player.y-y)*(player.y-y) < 900) continue;
     
     if (CanWalk(x,y)) {
-        AddItem(x,y);
-        num_items--;
+        AddWeapon(x,y);
+        num_weapons--;
+    };
+  };
+  
+  while (num_armor > 0) {
+    int x = (int)(dist(engine.rng)*width);
+    int y = (int)(dist(engine.rng)*height);
+    if (!isBeach(x,y)) continue;
+    
+    if (x < player.x) continue;
+    if ((player.x-x)*(player.x-x)+(player.y-y)*(player.y-y) < 900) continue;
+    
+    if (CanWalk(x,y)) {
+        AddArmor(x,y);
+        num_armor--;
     };
   };
 };
@@ -378,45 +404,52 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
   return monster;
 };
 
-void Map::AddItem(int x, int y) {
+void Map::AddArmor(int x, int y) {
+  Actor* armor = nullptr;
   std::uniform_int_distribution<> dist(0,100);
   int roll = dist(engine.rng);
   switch (engine.level) {
     case 1:
-      if (roll < 50) {
-        Actor* weapon = CreateItem(ItemType::SHORTBOW,x,y);
-        engine.actors.push_back(weapon);
-      } else {
-        Actor* armor = CreateItem(ItemType::LEATHER,x,y);
-        engine.actors.push_back(armor);
-      }
+      armor = CreateItem(ItemType::LEATHER,x,y);
+      engine.actors.push_back(armor);
       break;
     case 2:
-      if (roll < 50) {
-        Actor* weapon = CreateItem(ItemType::JAVELIN,x,y);
-        engine.actors.push_back(weapon);
-      } else {
-        Actor* armor = CreateItem(ItemType::BRONZE,x,y);
-        engine.actors.push_back(armor);
-      }
+      armor = CreateItem(ItemType::BRONZE,x,y);
+      engine.actors.push_back(armor);
       break;
     case 3:
-      if (roll < 50) {
-        Actor* weapon = CreateItem(LONGBOW,x,y);
-        engine.actors.push_back(weapon);
-      } else {
-        Actor* armor = CreateItem(ItemType::ADAMANT,x,y);
-        engine.actors.push_back(armor);
-      }
+      armor = CreateItem(ItemType::ADAMANT,x,y);
+      engine.actors.push_back(armor);
       break;
     case 4:
-      if (roll < 50) {
-        Actor* weapon = CreateItem(ItemType::ARTEMIS,x,y);
-        engine.actors.push_back(weapon);
-      } else {
-        Actor* armor = CreateItem(ItemType::ACHILLES,x,y);
-        engine.actors.push_back(armor);
-      }
+      armor = CreateItem(ItemType::ACHILLES,x,y);
+      engine.actors.push_back(armor);
+      break;
+    default:
+      break;
+    };
+};
+
+void Map::AddWeapon(int x, int y) {
+  Actor* weapon;
+  std::uniform_int_distribution<> dist(0,100);
+  int roll = dist(engine.rng);
+  switch (engine.level) {
+    case 1:
+      weapon = CreateItem(ItemType::SHORTBOW,x,y);
+      engine.actors.push_back(weapon);
+      break;
+    case 2:
+      weapon = CreateItem(ItemType::JAVELIN,x,y);
+      engine.actors.push_back(weapon);
+      break;
+    case 3:
+      weapon = CreateItem(ItemType::LONGBOW,x,y);
+      engine.actors.push_back(weapon);
+      break;
+    case 4:
+      weapon = CreateItem(ItemType::ARTEMIS,x,y);
+      engine.actors.push_back(weapon);
       break;
     default:
       break;
