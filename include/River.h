@@ -42,7 +42,6 @@ class River {
   const int rock_spacing = 2;
   std::vector<float> width;
   std::vector<float> shape;
-  std::vector<float> mean_velocity;
 
   void CreateRocks();
   float RockProbability(int x);
@@ -54,7 +53,7 @@ class River {
   float GetVelocity(int x, int y);
   bool isBeach(int x, int y);
   int GetPlayerStart(int x);
-  float max_velocity;
+  std::vector<float> mean_velocity;
 };
 
 #endif /* INCLUDE_RIVER_H_ */

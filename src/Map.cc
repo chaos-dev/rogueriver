@@ -46,8 +46,8 @@ void Map::Init(bool withActors) {
       tiles[x + y*width].u = vel*std::cos(river->angle[x]);
       tiles[x + y*width].v = vel*std::sin(river->angle[x]);
       if (vel > 0) {
-        tiles[x + y*width].color = water_color*(vel/river->max_velocity) + 
-                                   beach_color*(1.0-(vel/river->max_velocity));
+        tiles[x + y*width].color = water_color*(vel/(river->mean_velocity[x]*1.5)) + 
+                                   beach_color*(1.0-(vel/(river->mean_velocity[x]*1.5)));
       } else if (river->isBeach(x, y)) {
         tiles[x + y*width].color = beach_color;
       } else if (river->isBeach(x,y-1) || river->isBeach(x,y+1)) {

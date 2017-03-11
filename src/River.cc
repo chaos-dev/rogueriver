@@ -41,14 +41,11 @@ River::River(int length) : length(length) {
   angle[length-1] = std::tan(shape[length-1] - shape[length-2]);
   
   // Create the speed of the river
-  max_velocity = 0.0;
   float C = 1.00;    // constant on curve fit
   float p = -1.1;  // power on curve fit
   float Q = 40;      // m^3/s volumetric flowrate
   for (int i=0; i<length; i++) {
     mean_velocity[i] = C*std::pow(width[i]/Q, p);
-    if (1.5*mean_velocity[i] > max_velocity)
-        max_velocity = 1.5*mean_velocity[i];
   };
   
   CreateRocks();
