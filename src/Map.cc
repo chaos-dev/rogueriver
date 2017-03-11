@@ -27,8 +27,16 @@
 #include "Engine.h"
 
 Map::Map(int width, int height)
-    : width(width), height(height), 
-      water_color(4,69,143), beach_color(166,157, 123), bg_color(91,135,20) {
+    : width(width), height(height) {
+};
+
+Map::~Map() {
+    delete river;
+    tiles.clear();
+};
+
+void Map::Init(bool withActors) {
+  SetColors();
   tiles.resize(height*width);
   river = new River(width);
   for (int x=0; x<width; x++) {
@@ -67,7 +75,23 @@ Map::Map(int width, int height)
         }
     };
   };
-  
+};
+
+void Map::SetColors() {
+  switch (engine.level) {
+    case 1:
+      water_color.Update(4,69,143);
+      beach_color.Update(166,157,123);
+      bg_color.Update(91,135,20);
+      break;
+    case 2:
+      water_color.Update(4,69,143);
+      beach_color.Update(166,157,123);
+      bg_color.Update(91,135,20);
+      break;
+    default:
+      break;
+  }
 };
 
 bool Map::isWall(int x, int y) const {

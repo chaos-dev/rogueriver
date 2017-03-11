@@ -27,7 +27,7 @@
 #include "BearLibTerminal.h"
 
 Log::Log(int sidebar_width) : sidebar_width(sidebar_width), duplicate_count(1) {
-  Reset();
+  Clear();
   const std::string prompt =
       "Midway upon the journey of your life, you find yourself within a forest dark...";
   messages.push_back(Message(prompt));
@@ -143,7 +143,7 @@ void Log::Render() {
   terminal_bkcolor("black");
 };
 
-void Log::Reset() {
+void Log::Clear() {
   messages.clear();
   frame_offset = 0;
   dragging_scrollbar = false;
@@ -211,6 +211,10 @@ Gui::Gui(int sidebar_width) : sidebar_width(sidebar_width) {
 
 void Gui::Update() {
   log->Update();
+};
+
+void Gui::Clear() {
+  log->Clear();
 };
 
 void Gui::ProcessInput(int key) {

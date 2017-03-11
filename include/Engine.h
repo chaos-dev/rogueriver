@@ -46,6 +46,7 @@ class Engine {
   bool PickATile(int key, int *x, int *y, int max_range);
 
  public:
+  int level;
   Actor* player;
   Actor* raft;
   Map* map;
@@ -65,7 +66,10 @@ class Engine {
 
   Engine();
   ~Engine();
+  void Init();
   void Run();
+  void Term();
+  void NextLevel();
   bool CursorOnMap();
 };
 

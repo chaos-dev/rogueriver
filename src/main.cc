@@ -22,6 +22,7 @@
 Engine engine;
 
 int main() {
+   engine.Init();
    engine.Run();
 	
    return 0;

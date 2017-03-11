@@ -26,7 +26,8 @@
 
 #include "BearLibTerminal.h"
 
-Engine::Engine() {
+Engine::Engine() : status(OPEN), game_status(STARTUP), level(1), 
+    player(nullptr), raft(nullptr), map(nullptr) {
   terminal_open();
   // Terminal settings
   terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, size=132x43, minimum-size=80x24");
@@ -42,12 +43,22 @@ Engine::Engine() {
   status = OPEN;
   mouse = new Position(terminal_state(TK_MOUSE_X), terminal_state(TK_MOUSE_Y));
 
+  gui = new Gui(SIDEBAR_WIDTH);
+};
+
+Engine::~Engine() {
+  Term();
+  if (gui) delete gui;
+  terminal_close();
+};
+
+void Engine::Init() {
   // Seed RNG
   rng.seed(std::random_device()());
 
   // Initialize members
-  gui = new Gui(SIDEBAR_WIDTH);
   map = new Map(MAP_WIDTH, MAP_HEIGHT);
+  map->Init(true);
   map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
   Position player_start = map->GetPlayerStart();
   camera = new Position(player_start.x, player_start.y);
@@ -68,9 +79,12 @@ Engine::Engine() {
   engine.actors.push_front(raft);
 };
 
-Engine::~Engine() {
-  terminal_close();
-};
+void Engine::Term() {
+    actors.clear();
+    if (map) delete map;
+    if (camera) delete camera;
+    gui->Clear();
+}
 
 void Engine::ProcessInput() {
     while (terminal_has_input()) {
@@ -181,3 +195,24 @@ bool Engine::PickATile(int key, int *x, int *y, int max_range) {
   }
   return false;
 }
+
+void Engine::NextLevel() {
+  level++;
+  engine.gui->log->Print("[color=yellow]You carry your raft past the waterfall to the next section of the river.");
+  delete map;
+  
+  // delete all actors but the player and the raft
+  for (Actor* actor : actors) {
+    if (actor != player && actor != raft) {
+    };
+  };
+  
+  // create a new map
+  map = new Map(MAP_WIDTH, MAP_HEIGHT);
+  map->Init(true);
+  map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
+  Position player_start = map->GetPlayerStart();
+  player->x = player_start.x; player->y = player_start.y-1;
+  raft->x = player_start.x; raft->y = player_start.y - 2;
+  camera->x = player_start.x; camera->y = player_start.y-1;
+};

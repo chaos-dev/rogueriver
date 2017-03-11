@@ -63,11 +63,14 @@ class Map {
   
   void SetWall(int x, int y);
   bool inBounds(int x, int y) const;
+  void SetColors();
  public:
   int width, height;
   Position camera;
 
   Map(int width, int height);
+  ~Map();
+  void Init(bool withActors);
   bool isWall(int x, int y) const;
   bool isWater(int x, int y) const;
   bool isBeach(int x, int y) const;

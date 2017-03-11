@@ -69,6 +69,7 @@ class Log {
   void ProcessInput(int key);
   void Update();
   void Render();
+  void Clear();
 };
 
 class Gui {
@@ -85,6 +86,7 @@ class Gui {
   void ProcessInput(int key);
   void Update();
   void Render();
+  void Clear();
 };
 
 #endif // INCLUDE_GUI_H

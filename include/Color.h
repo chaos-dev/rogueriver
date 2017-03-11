@@ -26,6 +26,9 @@ struct Color {
     
     Color() : r(0), g(0), b(0) {};
     Color(int r, int g, int b) : r(r), g(g), b(b) {};
+    void Update(int r_new, int g_new, int b_new) {
+      r = r_new; g = g_new; b = b_new;
+    };
     
     color_t Convert() const {
         return color_from_argb(255, r, g, b);
