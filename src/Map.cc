@@ -56,7 +56,7 @@ void Map::Init(bool withActors) {
     }
   }
   std::uniform_real_distribution<> dist(0,1);
-  int num_enemies = (int)(dist(engine.rng)*20+40);
+  int num_enemies = (int)(dist(engine.rng)*20);
   while (num_enemies > 0) {
     int x = (int)(dist(engine.rng)*width);
     int y = (int)(dist(engine.rng)*height);
@@ -73,6 +73,21 @@ void Map::Init(bool withActors) {
         } else {
             num_enemies--;
         }
+    };
+  };
+  
+  int num_items = (int)(dist(engine.rng)*4+3);
+  while (num_items > 0) {
+    int x = (int)(dist(engine.rng)*width);
+    int y = (int)(dist(engine.rng)*height);
+    if (!isBeach(x,y)) continue;
+    
+    Position player = GetPlayerStart();
+    if ((player.x-x)*(player.x-x)+(player.y-y)*(player.y-y) < 900) continue;
+    
+    if (CanWalk(x,y)) {
+        AddItem(x,y);
+        num_items--;
     };
   };
 };
@@ -256,16 +271,16 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       monster = new Actor(x,y,'g',Color(198,198,198),1);
       switch (roll%4) {
         case 0:
-          monster->words = new Words("the ghost","The ghost","dead ghost","his","arrow","shadowy form");
-          monster->attacker = new Attacker(6,6,8,150);
-          break;
-        case 1:
           monster->words = new Words("the ghost","The ghost","dead ghost","his","javelin","shadowy form");
           monster->attacker = new Attacker(6,6,6,32);
           break;
-        case 2:
+        case 1:
           monster->words = new Words("the ghost","The ghost","dead ghost","his","sling","shadowy form");
           monster->attacker = new Attacker(6,6,3,12);
+          break;
+        case 2:
+          monster->words = new Words("the ghost","The ghost","dead ghost","his","spear","shadowy form");
+          monster->attacker = new Attacker(6,6,5,1);
           break;
         default:
           monster->words = new Words("the ghost","The ghost","dead ghost","his","sword","shadowy form");
@@ -340,7 +355,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       
     case MANTICORE:
       monster = new Actor(x,y,'M',Color(240,240,240),3);
-      monster->words = new Words("the manticore","The manticore","dead manticore","his","spines shot from its tail","thick hide");
+      monster->words = new Words("the manticore","The manticore","dead manticore","the","spines shot from his tail","thick hide");
       monster->destructible = new MonsterDestructible(22,3);
       monster->attacker = new Attacker(15,11,9,15);
       monster->can_fly = true;
@@ -364,4 +379,101 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
 };
 
 void Map::AddItem(int x, int y) {
+  std::uniform_int_distribution<> dist(0,100);
+  int roll = dist(engine.rng);
+  switch (engine.level) {
+    case 1:
+      if (roll < 50) {
+        Actor* weapon = CreateItem(ItemType::SHORTBOW,x,y);
+        engine.actors.push_back(weapon);
+      } else {
+        Actor* armor = CreateItem(ItemType::LEATHER,x,y);
+        engine.actors.push_back(armor);
+      }
+      break;
+    case 2:
+      if (roll < 50) {
+        Actor* weapon = CreateItem(ItemType::JAVELIN,x,y);
+        engine.actors.push_back(weapon);
+      } else {
+        Actor* armor = CreateItem(ItemType::BRONZE,x,y);
+        engine.actors.push_back(armor);
+      }
+      break;
+    case 3:
+      if (roll < 50) {
+        Actor* weapon = CreateItem(LONGBOW,x,y);
+        engine.actors.push_back(weapon);
+      } else {
+        Actor* armor = CreateItem(ItemType::ADAMANT,x,y);
+        engine.actors.push_back(armor);
+      }
+      break;
+    case 4:
+      if (roll < 50) {
+        Actor* weapon = CreateItem(ItemType::ARTEMIS,x,y);
+        engine.actors.push_back(weapon);
+      } else {
+        Actor* armor = CreateItem(ItemType::ACHILLES,x,y);
+        engine.actors.push_back(armor);
+      }
+      break;
+    default:
+      break;
+    };
+};
+
+Actor* Map::CreateItem(ItemType item_type, int x, int y) {
+  Actor* item = nullptr;
+  switch (item_type) {
+    case SHORTBOW:
+      item = new Actor(x,y,')',Color(240,240,240),1);
+      item->words = new Words("short bow","Short bow"," ", " ", " "," ");
+      item->item = new Item(5,150,0);
+      return item;
+      
+    case JAVELIN:
+      item = new Actor(x,y,'/',Color(240,240,240),1);
+      item->words = new Words("javelin", "Javelin", " ", " ", " "," ");
+      item->item = new Item(7,35,0);
+      return item;
+    
+    case LONGBOW:
+      item = new Actor(x,y,'}',Color(240,240,240),1);
+      item->words = new Words("longbow","Longbow"," ", " ", " "," ");
+      item->item = new Item(9,150,0);
+      return item;
+      
+    case ARTEMIS:
+      item = new Actor(x,y,'}',Color(240,0,0),1);
+      item->words = new Words("Artemis's bow","Artemis's bow"," ", " ", " "," ");
+      item->item = new Item(20,200,0);
+      return item;
+      
+    case LEATHER:
+      item = new Actor(x,y,'a',Color(240,240,240),1);
+      item->words = new Words("leather armor","Leather Armor"," ", " ", " "," ");
+      item->item = new Item(0,0,3);
+      return item;
+    
+    case BRONZE:
+      item = new Actor(x,y,'a',Color(240,240,240),1);
+      item->words = new Words("bronze breastplate and helmet","Bronze breatplate and helmet"," ", " ", " "," ");
+      item->item = new Item(0,0,6);
+      return item;
+      
+    case ADAMANT:
+      item = new Actor(x,y,'a',Color(240,240,240),1);
+      item->words = new Words("adamant breastplate and helmet","Adamant breatplate and helmet"," ", " ", " "," ");
+      item->item = new Item(0,0,10);
+      return item;
+      
+    case ACHILLES:
+      item = new Actor(x,y,'a',Color(240,240,240),1);
+      item->words = new Words("armor of Achilles","Armor of Achilles"," ", " ", " "," ");
+      item->item = new Item(0,0,500);
+      return item;
+  }
+  return nullptr;
+
 };

@@ -83,7 +83,18 @@ class Map {
       CHARYBDIS,
       CERBERUS
   };
+  enum ItemType {
+    SHORTBOW,
+    JAVELIN,
+    LONGBOW,
+    ARTEMIS,
+    LEATHER,
+    BRONZE,
+    ADAMANT,
+    ACHILLES
+  };
   Actor* CreateMonster(MonsterType monster_type, int x, int y);
+  Actor* CreateItem(ItemType item_type, int x, int y);
   int width, height;
   Position camera;
 

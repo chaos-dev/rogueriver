@@ -26,6 +26,7 @@ class Actor;
 #include "Color.h"
 #include "Destructible.h"
 #include "Attacker.h"
+#include "Item.h"
 
 class Actor {
  private:
@@ -41,6 +42,7 @@ class Actor {
   Ai* ai;
   Destructible* destructible;
   Attacker* attacker;
+  Item* item;
   
   Actor(int x, int y, int symbol, Color color, int speed);
   ~Actor();

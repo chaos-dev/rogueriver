@@ -31,7 +31,7 @@
  * @param name - A character array with the name of the actor
  */
 Actor::Actor(int x, int y, int symbol, Color color, int speed) :
-             x(x),y(y),symbol(symbol),ai(nullptr),
+             x(x),y(y),symbol(symbol),ai(nullptr), item(nullptr),
              destructible(nullptr), attacker(nullptr), words(nullptr),
              blocks(true), color(color), speed(speed), can_fly(false) {
 };
