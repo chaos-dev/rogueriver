@@ -58,6 +58,14 @@ void Map::Init(bool withActors) {
     }
   }
   
+  PlaceMonsters();
+  
+  PlaceItems();
+  
+  PlaceRocks();
+};
+
+void Map::PlaceMonsters() {
   Position player = GetPlayerStart();
   
   std::uniform_real_distribution<> dist(0,1);
@@ -79,7 +87,12 @@ void Map::Init(bool withActors) {
         }
     };
   };
+}
 
+void Map::PlaceItems() {
+  Position player = GetPlayerStart();
+
+  std::uniform_real_distribution<> dist(0,1);
   int num_armor; int num_weapons;
   if (engine.level == 4) {
     num_armor = 1; num_weapons = 1;
@@ -116,6 +129,23 @@ void Map::Init(bool withActors) {
     if (CanWalk(x,y)) {
         AddArmor(x,y);
         num_armor--;
+    };
+  };
+};
+
+void Map::PlaceRocks() {
+  for (Rock rock : river->rocks) {
+    if (rock.width == 1) {
+      Actor* actor = new Actor(rock.x, rock.y, '*', Color(137,136,131),1);
+       actor->words = new Words("rock","Rock"," "," "," "," ");
+      engine.actors.push_back(actor);
+    } else {
+      Actor* actor;
+      for (int i=0; i<rock.width; i++) {
+       Actor* actor = new Actor(rock.x, rock.y+i, '*', Color(137,136,131),1);
+       actor->words = new Words("rock","Rock"," "," "," "," ");
+       engine.actors.push_back(actor);
+      };
     };
   };
 };
@@ -334,7 +364,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       return monster;
       
     case GHOUL:
-      monster = new Actor(x,y,'s',Color(240,240,240),1);
+      monster = new Actor(x,y,'g',Color(240,240,240),1);
       monster->words = new Words("the ghoul","The ghoul","pile of bones","his","acidic blood","bones");
       if (roll%2 == 0) monster->words->possessive = "her";
       monster->destructible = new MonsterDestructible(19,0);

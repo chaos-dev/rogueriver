@@ -62,6 +62,9 @@ class Map {
   void AddMonster(int x, int y);
   void AddWeapon(int x, int y);
   void AddArmor(int x, int y);
+  void PlaceItems();
+  void PlaceMonsters();
+  void PlaceRocks();
   
   void SetWall(int x, int y);
   bool inBounds(int x, int y) const;

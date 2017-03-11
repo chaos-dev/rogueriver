@@ -24,22 +24,33 @@
 #include <cmath>
 #include <random>
 
+struct Rock {
+  int x, y;
+  int width;
+  Rock() : x(0), y(0), width(1) {};
+  Rock(int x, int y, int width) : x(x), y(y), width(width) {};
+};
+
 class River {
  protected:
-  int length;
-  float min_width = 15;
-  float max_width = 40;
-  float min_travel = 30;
-  float max_travel = 90;
-  int num_periods = 3;
+  const int length;
+  const float min_width = 15;
+  const float max_width = 40;
+  const float min_travel = 30;
+  const float max_travel = 90;
+  const int num_periods = 3;
+  const int rock_spacing = 2;
   std::vector<float> width;
   std::vector<float> shape;
   std::vector<float> mean_velocity;
-  
+
+  void CreateRocks();
+  float RockProbability(int x);
   std::vector<float> RandomSignal(int n, float y_min, float y_max, float min_period, float max_period, int num_periods);
  public:
   River(int length);
   std::vector<float> angle;
+  std::vector<Rock> rocks;
   float GetVelocity(int x, int y);
   bool isBeach(int x, int y);
   int GetPlayerStart(int x);

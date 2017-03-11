@@ -19,6 +19,7 @@
 #include "River.h"
 
 #include <cmath>
+#include <iostream>
 
 #include "Engine.h"
 
@@ -41,14 +42,16 @@ River::River(int length) : length(length) {
   
   // Create the speed of the river
   max_velocity = 0.0;
-  float C = 2.00;    // constant on curve fit
-  float p = -0.395;  // power on curve fit
+  float C = 1.00;    // constant on curve fit
+  float p = -1.1;  // power on curve fit
   float Q = 40;      // m^3/s volumetric flowrate
   for (int i=0; i<length; i++) {
     mean_velocity[i] = C*std::pow(width[i]/Q, p);
     if (1.5*mean_velocity[i] > max_velocity)
         max_velocity = 1.5*mean_velocity[i];
   };
+  
+  CreateRocks();
 };
 
 std::vector<float> River::RandomSignal(int n, float y_min, float y_max,
@@ -100,6 +103,26 @@ bool River::isBeach(int x, int y) {
 
 int River::GetPlayerStart(int x) {
     return shape[x] + width[x]/2 + 2;
+};
+
+void River::CreateRocks() {
+  std::uniform_real_distribution<float> dist(0,1);
+  for (int x=0; x<length; x+=rock_spacing) {
+    for (int i=0; i<2; i++) {
+      float roll = dist(engine.rng);
+      if (roll < RockProbability(x)) {
+        std::normal_distribution<float> normal(shape[x], width[x]/4.0);
+        int y = (int)normal(engine.rng);
+        int width = (x+y)%2+1;  // This is a hack to avoid another random number
+        rocks.push_back(Rock(x,y,width));
+      }
+    }
+  }
+};
+
+float River::RockProbability(int x) {
+  float xi = (width[x]-min_width)/(max_width-min_width);
+  return (0.3+0.5*engine.level/5)*(xi-1)*(xi-1);
 };
 
 
