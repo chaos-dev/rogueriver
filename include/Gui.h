@@ -24,6 +24,8 @@
 #include <cmath>
 #include <sstream>
 
+#include "Color.h"
+
 // A string plus its precalculated height.
 struct Message {
 	Message() : height(0) { };
@@ -72,6 +74,10 @@ class Log {
 class Gui {
  private:
   const int sidebar_width;
+  void RenderBar(int x, int y, int width, const char *name,
+		         float value, float maxValue, const Color barColor,
+		         const Color backColor);
+  void RenderMouseLook();
  public:
   Log* log;
   Gui(int sidebar_width);

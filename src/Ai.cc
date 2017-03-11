@@ -23,6 +23,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <algorithm>
 
 #include "Actor.h"
 #include "Engine.h"
@@ -249,6 +250,8 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
   bool moved = (owner->x != temp_x || owner->y != temp_y);
   if ((targetx != owner->x || targety != owner->y) && !moved && !attacking)
       engine.gui->log->Print("You fight the current, but make no progress.");
+  if ((targetx < owner->x) && (targetx < temp_x) && moved)
+      engine.gui->log->Print("Despite your efforts, the current takes you downstream.");
   
   // look for corpses or items
   if (moved) {
@@ -262,9 +265,21 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
       }
   }
   
-  if (on_raft && engine.map->isWater(targetx, targety)) {
-    engine.raft->x = owner->x; engine.raft->y = owner->y;
+  if (on_raft) {
+    if (engine.map->isWater(targetx, targety)) {
+      // Move the raft with the player.
+      engine.raft->x = owner->x; engine.raft->y = owner->y;
+    } else {
+      engine.gui->log->Print("You climb off the raft.");
+    }
+  } else {
+    if ((engine.player->x == engine.raft->x) && 
+        (engine.player->y == engine.raft->y)) {
+      engine.gui->log->Print("You board the raft.");
+    }
   }
+  
+  
   
   return true;
   

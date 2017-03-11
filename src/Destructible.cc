@@ -78,7 +78,7 @@ PlayerDestructible::PlayerDestructible(int maxHp, int armor) :
 }
 
 void PlayerDestructible::die(Actor *owner) {
-	engine.gui->log->Print("You died!");
+	engine.gui->log->Print("[color=red]You died!");
 	Destructible::die(owner);
 	// make sure your corpse is on top
 	for (unsigned int i=0; i<engine.actors.size(); i++) {

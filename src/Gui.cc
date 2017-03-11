@@ -27,10 +27,11 @@
 Log::Log(int sidebar_width) : sidebar_width(sidebar_width), duplicate_count(1) {
   Reset();
   const std::string prompt =
-      "Use arrow keys or mouse wheel to scroll the list up and down. "
-      "Try to resize the window.\n--- --- ---";
+      "Use the scrollbar or a mouse scrollwheel to move the log.";
   messages.push_back(Message(prompt));
-  Print("%d goblins appear!",2);
+  Print("----------------------------------");
+  Print("Midway upon the journey of your life, you find yourself within a forest dark...");
+  Print(" ");
   UpdateGeometry();
 };
 
@@ -171,6 +172,7 @@ int Log::UpdateHeights() {
 
 void Log::UpdateGeometry() {
   bool at_bottom = ((frame_offset + frame_height) == total_messages_height);
+  if (total_messages_height <= frame_height) at_bottom = true;
 
   // Save current scroll position
   float current_offset_percentage = frame_offset / (float)total_messages_height;
@@ -218,3 +220,12 @@ void Gui::ProcessInput(int key) {
 void Gui::Render() {
   log->Render();
 }
+
+void Gui::RenderBar(int x, int y, int width, const char *name,
+		            float value, float maxValue, const Color barColor,
+		            const Color backColor) {
+
+}
+
+void RenderMouseLook() {
+};
