@@ -108,8 +108,9 @@ void Attacker::Message(bool hits, bool penetrates, bool dodged, int damage, Acto
 	if (target->destructible) {
 	    if ( dodged ) {
 		    const char* temp_word = ((owner == engine.player)? "r" : "'s");
-			engine.gui->log->Print("%s dodges away from %s%s %s.",
-			                       target->words->Name,
+		    const char* temp_word2 = ((owner == engine.player)? "dodge" : "dodges");
+			engine.gui->log->Print("%s %s away from %s%s %s.",
+			                       target->words->Name, temp_word2,
 			                       owner->words->name, temp_word, 
 			                       owner->words->weapon.c_str());
 	    } else if ( penetrates ) {
@@ -138,7 +139,7 @@ void Attacker::Message(bool hits, bool penetrates, bool dodged, int damage, Acto
 	} else {
 		engine.gui->log->Print("%s attacks %s in vain.",
 		                       owner->words->Name,
-			                   target->words->name);
+			                     target->words->name);
 	};
 };
 
@@ -184,7 +185,7 @@ bool Attacker::InRange(Actor* owner, Actor* target) {
   float distance = owner->GetDistance(target->x, target->y);
   if (max_range <= 1) {
     return false;
-  } else if (distance > 70) {
+  } else if (distance > std::min(70,owner->attacker->max_range)) {
     return false;
   } else if (distance <= 3) {
     return true;

@@ -67,14 +67,14 @@ void Engine::Init() {
   player = new Actor(player_start.x, player_start.y, (int)'@', Color(240,240,240), 1);
   player->words = new Words("you","You","your corpse","your","sling","robes");
   player->ai = new PlayerAi();
-  player->destructible=new PlayerDestructible(90,2);
+  player->destructible=new PlayerDestructible(20,2);
   player->attacker = new Attacker(15,16,3,12);
   engine.actors.push_back(player);
   
   // Create raft
   raft = new Actor(player_start.x, player_start.y-2, (int)'#', Color(129,76,42), 1);
   raft->words = new Words("raft","Raft","pile of logs"," "," ","thick wood");
-  raft->destructible = new RaftDestructible(45,9);
+  raft->destructible = new RaftDestructible(20,9);
   raft->blocks = false;
   engine.actors.push_front(raft);
 };

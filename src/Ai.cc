@@ -285,18 +285,6 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
   
   if (moved && on_raft) CheckRaftDamage(owner, temp_x, temp_y);
   
-  // look for corpses or items
-  if (moved) {
-      for (Actor* actor : engine.actors) {
-        //bool corpseOrItem=(actor->destructible && actor->destructible->isDead())
-	    //		    || actor->pickable;
-	    bool corpse_or_item = (actor->destructible && actor->destructible->isDead());
-        if ( corpse_or_item && actor->x == owner->x && actor->y == owner->y ) {
-          engine.gui->log->Print("There's a %s here.",actor->words->name);
-        }
-      }
-  }
-  
   if (on_raft) {
     if (engine.map->isWater(targetx, targety)) {
       // Move the raft with the player.

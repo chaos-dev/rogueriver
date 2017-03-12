@@ -63,13 +63,30 @@ void Map::Init(bool withActors) {
   PlaceItems();
   
   PlaceRocks();
+  
+  // Push the raft and the player back to the top so he's drawn last.
+  for (int i=0; i<engine.actors.size(); i++) {
+    if (engine.actors[i] == engine.raft) {
+      engine.actors.erase(engine.actors.begin()+i);
+      engine.actors.push_back(engine.raft);
+      break;
+    };
+  }
+  
+  for (int i=0; i<engine.actors.size(); i++) {
+      if (engine.actors[i] == engine.player) {
+      engine.actors.erase(engine.actors.begin()+i);
+      engine.actors.push_back(engine.player);
+      break;
+    };
+  }
 };
 
 void Map::PlaceMonsters() {
   Position player = GetPlayerStart();
   
   std::uniform_real_distribution<> dist(0,1);
-  int num_enemies = (int)(dist(engine.rng)*20);
+  int num_enemies = (int)(dist(engine.rng)*10+15);
   while (num_enemies > 0) {
     int x = (int)(dist(engine.rng)*width);
     int y = (int)(dist(engine.rng)*height);
@@ -99,8 +116,8 @@ void Map::PlaceItems() {
   } else if (engine.level == 5) {
     num_armor = 0; num_weapons = 0;
   } else {
-    num_armor = (int)(dist(engine.rng)*2+1);
-    num_weapons = (int)(dist(engine.rng)*2+1);
+    num_armor = (int)(dist(engine.rng)*3+1);
+    num_weapons = (int)(dist(engine.rng)*3+1);
   }
 
   if (engine.level > 3) num_weapons = 1;
