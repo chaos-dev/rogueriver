@@ -283,6 +283,8 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
   if ((targetx < owner->x) && (targetx < temp_x) && moved)
       engine.gui->log->Print("Despite your efforts, the current takes you downstream.");
   
+  if (moved && on_raft) CheckRaftDamage(owner, temp_x, temp_y);
+  
   // look for corpses or items
   if (moved) {
       for (Actor* actor : engine.actors) {
@@ -309,8 +311,29 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
     }
   }
   
-  
-  
   return true;
   
 }
+
+void PlayerAi::CheckRaftDamage(Actor *owner, int old_x, int old_y) {
+  int hits = 0;
+  float distance = owner->GetDistance(old_x, old_y);
+  float cos_theta = (owner->x - old_x)/distance;
+  float sin_theta = (owner->y - old_y)/distance;
+  float x = old_x; float y = old_y;
+  int temp_x = old_x; int temp_y = old_y;
+  float delta = distance/8.0;
+  while (std::abs(x - owner->x) > 1e-3 || std::abs(y - owner->y) > 1e-3) {
+    x+= delta*cos_theta; y+=delta*sin_theta;
+    if (std::round(x) != temp_x || std::round(y) != temp_y) {
+      temp_x = std::round(x); temp_y = std::round(y);
+      if (engine.map->isRock(temp_x,temp_y)) hits++;
+    }
+  };
+  if (hits > 1) {
+    engine.gui->log->Print("Your raft hits some rocks, and takes %d damage!",hits);
+  } else if (hits == 1) {
+    engine.gui->log->Print("Your raft hits a rock, and takes 1 damage!");
+  };
+  engine.raft->destructible->takeDamage(engine.raft, hits);
+};

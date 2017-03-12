@@ -55,6 +55,7 @@ public :
   void Update(Actor *owner);
   void ProcessInput(Actor *owner, int key, bool shift);
 	bool isActive(Actor *owner);
+	void CheckRaftDamage(Actor* owner, int old_x, int old_y);
 protected :
 	int dx, dy; // Amount requested to move this next turn
 	bool move;  // Is the player moving?

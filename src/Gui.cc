@@ -317,15 +317,9 @@ void Gui::RenderMouseLook(int x, int y) {
     
     // Check the terrain
   if (engine.map->isWater(engine.mouse->x, engine.mouse->y)) {
-    if (engine.level == 5) {
-      terminal_printf(x, y+2, " blood with speed: [[%4.1f, %4.1f]] m/s",
-                      engine.map->GetUVelocity(engine.mouse->x, engine.mouse->y),
-                      engine.map->GetVVelocity(engine.mouse->x, engine.mouse->y));
-    } else {
       terminal_printf(x, y+2, " river with speed: [[%4.1f, %4.1f]] m/s",
                       engine.map->GetUVelocity(engine.mouse->x, engine.mouse->y),
                       engine.map->GetVVelocity(engine.mouse->x, engine.mouse->y));
-    };
   } else if (engine.map->isBeach(engine.mouse->x, engine.mouse->y)) {
     if (engine.level <= 2) {
       terminal_printf(x, y+2, " sand");
@@ -335,8 +329,6 @@ void Gui::RenderMouseLook(int x, int y) {
   } else {
     if (engine.level <= 2) {
       terminal_printf(x, y+2, " grass");
-    } else if (engine.level == 3) {
-      terminal_printf(x, y+2, " dead grass");
     } else {
       terminal_printf(x, y+2, " rock");
     }

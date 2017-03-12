@@ -32,7 +32,7 @@ Engine::Engine() : status(OPEN), game_status(STARTUP), level(1),
   // Terminal settings
   terminal_set("window: title='Rogue River: Obol of Charon', resizeable=true, size=132x43, minimum-size=80x24");
   terminal_set("font: graphics/VeraMono.ttf, size=8x16");
-  terminal_set("tile font: graphics/Anikki_square_16x16.bmp, size=16x16, codepage=437, align=top-left");
+  terminal_set("tile font: graphics/Anikki_square_16x16.bmp, codepage=437, size=16x16, align=top-left");
   terminal_set("input.filter={keyboard, mouse+}, precise-mouse=true");
   terminal_composition(TK_ON);
   terminal_bkcolor("black");
@@ -198,23 +198,41 @@ bool Engine::PickATile(int key, int *x, int *y, int max_range) {
 
 void Engine::NextLevel() {
   level++;
-  engine.gui->log->Print("[color=yellow]You carry your raft past the waterfall to the next section of the river.");
-  delete map;
-  
-  // delete all actors but the player and the raft
-  for (unsigned int i=0; i<actors.size(); i++) {
-    if (actors[i] != player && actors[i] != raft) {
-      actors.erase(actors.begin()+i);
-      i--;
+  switch (level) {
+    case 2:
+      engine.gui->log->Print("[color=amber]You carry your raft past the waterfall to the next section of the river.");
+      break;
+    case 3:
+      engine.gui->log->Print("[color=amber]You paddle ahead to where the river enters a cave.");
+      break;
+    case 4:
+      engine.gui->log->Print("[color=amber]You race away from the harpies, entering a dark fork of the cave.");
+      break;
+    case 5:
+      engine.gui->log->Print("[color=amber]You enter another fork of the cave, where the river has the color of blood.");
+      break;
+   };
+   
+  if (level == 6) {
+    // TODO: End condition
+  } else {
+    delete map;
+    
+    // delete all actors but the player and the raft
+    for (unsigned int i=0; i<actors.size(); i++) {
+      if (actors[i] != player && actors[i] != raft) {
+        actors.erase(actors.begin()+i);
+        i--;
+      };
     };
-  };
-  
-  // create a new map
-  map = new Map(MAP_WIDTH, MAP_HEIGHT);
-  map->Init(true);
-  map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
-  Position player_start = map->GetPlayerStart();
-  player->x = player_start.x; player->y = player_start.y-1;
-  raft->x = player_start.x; raft->y = player_start.y - 2;
-  camera->x = player_start.x; camera->y = player_start.y-1;
+    
+    // create a new map
+    map = new Map(MAP_WIDTH, MAP_HEIGHT);
+    map->Init(true);
+    map_panel.Update(0, 0, width-SIDEBAR_WIDTH, height);
+    Position player_start = map->GetPlayerStart();
+    player->x = player_start.x; player->y = player_start.y-1;
+    raft->x = player_start.x; raft->y = player_start.y - 2;
+    camera->x = player_start.x; camera->y = player_start.y-1;
+  }
 };

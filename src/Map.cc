@@ -136,13 +136,13 @@ void Map::PlaceItems() {
 void Map::PlaceRocks() {
   for (Rock rock : river->rocks) {
     if (rock.width == 1) {
-      Actor* actor = new Actor(rock.x, rock.y, '*', Color(137,136,131),1);
+      Actor* actor = new Actor(rock.x, rock.y, '*', rock_color,1);
        actor->words = new Words("rock","Rock"," "," "," "," ");
       engine.actors.push_back(actor);
     } else {
       Actor* actor;
       for (int i=0; i<rock.width; i++) {
-       Actor* actor = new Actor(rock.x, rock.y+i, '*', Color(137,136,131),1);
+       Actor* actor = new Actor(rock.x, rock.y+i, '*', rock_color,1);
        actor->words = new Words("rock","Rock"," "," "," "," ");
        engine.actors.push_back(actor);
       };
@@ -156,26 +156,31 @@ void Map::SetColors() {
       water_color.Update(4,69,143);
       beach_color.Update(166,157,123);
       bg_color.Update(91,135,20);
+      rock_color.Update(91,96,87);
       break;
     case 2:
       water_color.Update(23,61,64);
       beach_color.Update(127,128,132);
       bg_color.Update(83,108,76);
+      rock_color.Update(109,89,89);
       break;
     case 3:
       water_color.Update(23,61,64);
       beach_color.Update(117,122,100);
       bg_color.Update(71,51,40);
+      rock_color.Update(75,66,55);
       break;
     case 4:
       water_color.Update(23,61,64);
       beach_color.Update(107,83,49);
       bg_color.Update(50,36,23);
+      rock_color.Update(50,36,23);
       break;
     case 5:
       water_color.Update(92,10,12);
       bg_color.Update(24,12,14);
       beach_color.Update(59,64,60);
+      rock_color.Update(24,12,14);
       break;
     default:
       break;
@@ -208,6 +213,14 @@ void Map::SetWall(int x, int y) {
 
 bool Map::inBounds(int x, int y) const {
     return ((x >= 0) && (x < width) && (y >= 0) && (y < height));
+}
+
+bool Map::isRock(int x, int y) const {
+  for (Rock rock : river->rocks) {
+    if (rock.x == x && rock.y == y) return true;
+    if (rock.x == x && rock.y+1 == y && rock.width == 2) return true;
+  };
+  return false;
 }
 
 void Map::Render(Panel panel, Position* camera) const {
@@ -318,7 +331,7 @@ void Map::AddMonster(int x, int y) {
         engine.actors.push_back(stymp);
       }
       break;
-    default:
+    default: 
       break;
   };
 };
@@ -329,11 +342,11 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
   Actor* monster = nullptr;
   switch (monster_type) {
     case GHOST:
-      monster = new Actor(x,y,'g',Color(198,198,198),1);
+      monster = new Actor(x,y,'g',Color(138,112,144),1);
       switch (roll%4) {
         case 0:
           monster->words = new Words("the ghost","The ghost","dead ghost","his","javelin","shadowy form");
-          monster->attacker = new Attacker(6,6,6,32);
+          monster->attacker = new Attacker(6,6,6,32); 
           break;
         case 1:
           monster->words = new Words("the ghost","The ghost","dead ghost","his","sling","shadowy form");
@@ -355,7 +368,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       return monster;
       
     case SKELETON:
-      monster = new Actor(x,y,'s',Color(240,240,240),1);
+      monster = new Actor(x,y,'s',Color(241,224,197),1);
       monster->words = new Words("the skeleton","The skeleton","pile of bones","his","sword","bones");
       if (roll%2 == 0) monster->words->possessive = "her";
       monster->destructible = new MonsterDestructible(12,0);
@@ -364,7 +377,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       return monster;
       
     case GHOUL:
-      monster = new Actor(x,y,'g',Color(240,240,240),1);
+      monster = new Actor(x,y,'g',Color(62,137,20),1);
       monster->words = new Words("the ghoul","The ghoul","pile of bones","his","acidic blood","bones");
       if (roll%2 == 0) monster->words->possessive = "her";
       monster->destructible = new MonsterDestructible(19,0);
@@ -373,15 +386,15 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       return monster;
     
     case CENTAUR:
-      monster = new Actor(x,y,'c',Color(240,240,240),2);
+      monster = new Actor(x,y,'c',Color(201,183,156),2);
       monster->words = new Words("the centaur","The centaur","dead centaur","his","arrow","skin");
-      monster->destructible = new MonsterDestructible(16,0);
+      monster->destructible = new MonsterDestructible(16,0);  
       monster->attacker = new Attacker(6,9,14,150);
       monster->ai = new MonsterAi();
       return monster;
-      
+       
     case HARPY:
-      monster = new Actor(x,y,'h',Color(240,240,240),3);
+      monster = new Actor(x,y,'h',Color(213,160,33),3);
       monster->words = new Words("the harpy","The harpy","dead harpy","her","claws","skin");
       monster->destructible = new MonsterDestructible(26,0);
       monster->can_fly = true;
@@ -390,7 +403,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       return monster;
       
     case STYMP:
-      monster = new Actor(x,y,'v',Color(240,240,240),4);
+      monster = new Actor(x,y,'v',Color(213,137,54),4);
       monster->words = new Words("the stymphalian bird","The stymphalian bird","dead stymphalian bird","his","bronze beak","metal feathers");
       monster->destructible = new MonsterDestructible(21,6);
       monster->can_fly = true;
@@ -399,7 +412,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       return monster;
       
     case GIANT:
-      monster = new Actor(x,y,'G',Color(240,240,240),2);
+      monster = new Actor(x,y,'G',Color(130,115,92),2); 
       monster->words = new Words("the giant","The giant","dead giant","his","boulder","fur coat");
       monster->destructible = new MonsterDestructible(32,2);
       monster->attacker = new Attacker(10,3,25,12);
@@ -407,7 +420,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       return monster;
     
     case CYCLOPS:
-      monster = new Actor(x,y,'C',Color(240,240,240),1);
+      monster = new Actor(x,y,'O',Color(86,54,53),1);
       monster->words = new Words("the cyclops","The cyclops","dead cyclops","his","massive club","skin");
       monster->destructible = new MonsterDestructible(26,0);
       monster->attacker = new Attacker(7,3,20,1);
@@ -415,7 +428,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       return monster;
       
     case MANTICORE:
-      monster = new Actor(x,y,'M',Color(240,240,240),3);
+      monster = new Actor(x,y,'M',Color(0,0,0),3);
       monster->words = new Words("the manticore","The manticore","dead manticore","the","spines shot from his tail","thick hide");
       monster->destructible = new MonsterDestructible(22,3);
       monster->attacker = new Attacker(15,11,9,15);
@@ -423,10 +436,10 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       monster->ai = new MonsterAi();
       return monster;
     case DRAGON:
-      monster = new Actor(x,y,'D',Color(240,240,240),1);
+      monster = new Actor(x,y,'D',Color(164,66,0),1);
       monster->words = new Words("the dragon","The dragon","dead dragon","her","fiery breath","scales");
       monster->destructible = new MonsterDestructible(30,9);
-      monster->attacker = new Attacker(30,21,18,40);
+      monster->attacker = new Attacker(30,21,18,40); 
       monster->can_fly = true;
       monster->ai = new MonsterAi();
       return monster;
@@ -503,49 +516,49 @@ Actor* Map::CreateItem(ItemType item_type, int x, int y) {
   Actor* item = nullptr;
   switch (item_type) {
     case SHORTBOW:
-      item = new Actor(x,y,')',Color(240,240,240),1);
+      item = new Actor(x,y,')',Color(141,59,114),1);
       item->words = new Words("short bow","Short bow"," ", " ", "arrows"," ");
       item->item = new Item(5,150,0);
       return item;
       
     case JAVELIN:
-      item = new Actor(x,y,'/',Color(240,240,240),1);
+      item = new Actor(x,y,'/',Color(157,203,186),1);
       item->words = new Words("set of javelins", "Set of javelins", " ", " ", "javelin"," ");
       item->item = new Item(7,35,0);
       return item;
     
     case LONGBOW:
-      item = new Actor(x,y,'}',Color(240,240,240),1);
+      item = new Actor(x,y,'}',Color(75,59,64),1);
       item->words = new Words("longbow","Longbow"," ", " ", "arrows"," ");
       item->item = new Item(9,150,0);
       return item;
       
     case ARTEMIS:
-      item = new Actor(x,y,'}',Color(240,0,0),1);
+      item = new Actor(x,y,'}',Color(83,216,251),1);
       item->words = new Words("Artemis's bow","Artemis's bow"," ", " ", "arrows"," ");
       item->item = new Item(20,200,0);
       return item;
       
     case LEATHER:
-      item = new Actor(x,y,'a',Color(240,240,240),1);
+      item = new Actor(x,y,'a',Color(220,191,133),1);
       item->words = new Words("leather armor","Leather Armor"," ", " ", " "," ");
       item->item = new Item(0,0,3);
       return item;
     
     case BRONZE:
-      item = new Actor(x,y,'a',Color(240,240,240),1);
+      item = new Actor(x,y,'a',Color(225,176,126),1);
       item->words = new Words("bronze breastplate and helmet","Bronze breatplate and helmet"," ", " ", " "," ");
       item->item = new Item(0,0,6);
       return item;
       
     case ADAMANT:
-      item = new Actor(x,y,'a',Color(240,240,240),1);
+      item = new Actor(x,y,'a',Color(61,163,93),1); 
       item->words = new Words("adamant breastplate and helmet","Adamant breatplate and helmet"," ", " ", " "," ");
       item->item = new Item(0,0,10);
       return item;
       
     case ACHILLES:
-      item = new Actor(x,y,'a',Color(240,240,240),1);
+      item = new Actor(x,y,'a',Color(102,195,255),1);
       item->words = new Words("armor of Achilles","Armor of Achilles"," ", " ", " "," ");
       item->item = new Item(0,0,500);
       return item;

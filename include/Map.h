@@ -56,7 +56,7 @@ struct Tile {
 
 class Map {
  protected:
-  Color beach_color, water_color, bg_color;
+  Color beach_color, water_color, bg_color, rock_color;
   std::vector<Tile> tiles;
   River* river;
   void AddMonster(int x, int y);
@@ -109,6 +109,7 @@ class Map {
   bool isWall(int x, int y) const;
   bool isWater(int x, int y) const;
   bool isBeach(int x, int y) const;
+  bool isRock(int x, int y) const;
   Position GetPlayerStart() const;
   float GetUVelocity(int x, int y) const;
   float GetVVelocity(int x, int y) const;
