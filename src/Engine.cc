@@ -67,7 +67,7 @@ void Engine::Init() {
   player = new Actor(player_start.x, player_start.y, (int)'@', Color(240,240,240), 1);
   player->words = new Words("you","You","your corpse","your","sling","robes");
   player->ai = new PlayerAi();
-  player->destructible=new PlayerDestructible(20,2);
+  player->destructible=new PlayerDestructible(100,2);
   player->attacker = new Attacker(15,16,3,12);
   engine.actors.push_back(player);
   
@@ -100,10 +100,14 @@ void Engine::ProcessInput() {
       if (key == TK_CLOSE || key == TK_ESCAPE) {
         status = CLOSED;
       } else if (key == TK_MOUSE_MOVE) {
-        mouse->x = terminal_state(TK_MOUSE_X)/2 + camera->x - map_panel.width/4;
-        mouse->y = -terminal_state(TK_MOUSE_Y) + camera->y + map_panel.height/2;
+        UpdateMouse(); // This is actually redundant.
       }
   }
+};
+
+void Engine::UpdateMouse() {
+  mouse->x = terminal_state(TK_MOUSE_X)/2 + camera->x - map_panel.width/4;
+  mouse->y = -terminal_state(TK_MOUSE_Y) + camera->y + map_panel.height/2;
 };
 
 void Engine::Render() {
@@ -145,6 +149,7 @@ void Engine::Update() {
   }
   player->Update();
   if (game_status == NEW_TURN) {
+    UpdateMouse(); // Map may have moved...
     for (Actor* actor : actors) {
         if (actor != player) actor->Update();
     }
@@ -173,7 +178,6 @@ bool Engine::CursorOnMap() {
 };
 
 bool Engine::PickATile(int key, int *x, int *y, int max_range) {
-
   if (key == TK_MOUSE_LEFT && CursorOnMap()) {
     float distance = player->GetDistance(mouse->x, mouse->y);
     if (distance < max_range) {

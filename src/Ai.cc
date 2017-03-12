@@ -120,7 +120,7 @@ void MonsterAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 }
 
 
-PlayerAi::PlayerAi() : dx(0), dy(0), move(false), running(false){
+PlayerAi::PlayerAi() : dx(0), dy(0), move(false) {
 }
 
 /** Checks to see if the player should be considered for effects, etc.
@@ -184,16 +184,6 @@ void PlayerAi::ProcessInput(Actor *owner, int key, bool shift) {
     dx = 0; dy = 0; move = true;
   } else if (key == TK_F && !shift) {
     engine.game_status = Engine::AIMING;
-  } else if (key == TK_R && !shift) {
-    if (running) {
-      running = false;
-    } else {
-      running = true;
-    }
-  }
-  if (running) {
-    dx *= 2;
-    dy *= 2;
   }
 }
 

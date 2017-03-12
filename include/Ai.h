@@ -59,7 +59,6 @@ public :
 protected :
 	int dx, dy; // Amount requested to move this next turn
 	bool move;  // Is the player moving?
-	bool running; // Is the player running?
 	bool fire; // Is the player going to fire a weapon?
 	bool moveOrAttack(Actor *owner, int targetx, int targety);
 };

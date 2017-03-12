@@ -406,23 +406,23 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       monster = new Actor(x,y,'c',Color(201,183,156),2);
       monster->words = new Words("the centaur","The centaur","dead centaur","his","arrow","skin");
       monster->destructible = new MonsterDestructible(16,0);  
-      monster->attacker = new Attacker(6,9,14,150);
+      monster->attacker = new Attacker(20,9,14,150);
       monster->ai = new MonsterAi();
       return monster;
        
     case HARPY:
       monster = new Actor(x,y,'h',Color(213,160,33),3);
-      monster->words = new Words("the harpy","The harpy","dead harpy","her","claws","skin");
-      monster->destructible = new MonsterDestructible(26,0);
+      monster->words = new Words("the harpy","The harpy","dead harpy","her","claws","thick skin");
+      monster->destructible = new MonsterDestructible(21,0);
       monster->can_fly = true;
-      monster->attacker = new Attacker(14,15,12,1);
+      monster->attacker = new Attacker(14,9,12,0);
       monster->ai = new MonsterAi();
       return monster;
       
     case STYMP:
       monster = new Actor(x,y,'v',Color(213,137,54),4);
       monster->words = new Words("the stymphalian bird","The stymphalian bird","dead stymphalian bird","his","bronze beak","metal feathers");
-      monster->destructible = new MonsterDestructible(21,6);
+      monster->destructible = new MonsterDestructible(26,6);
       monster->can_fly = true;
       monster->attacker = new Attacker(15,9,15,1);
       monster->ai = new MonsterAi();

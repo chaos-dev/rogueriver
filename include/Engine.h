@@ -41,6 +41,7 @@ class Engine {
 
   void ProcessInput();
   void Update();
+  void UpdateMouse();
   void Render();
   void RenderActor(Actor* actor);
   bool PickATile(int key, int *x, int *y, int max_range);

@@ -167,6 +167,9 @@ int Attacker::GetRangeModifier(Actor* owner, Actor* target) {
 };
 
 void Attacker::SetAim(Actor* target) {
+#ifndef NDEBUG
+    engine.gui->log->Print("[color=grey]Setting aim on: %s",target->words->name);
+#endif
     firing = true;
     current_target = target;
 };
