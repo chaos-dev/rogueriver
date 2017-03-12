@@ -30,8 +30,8 @@
 
 class Engine {
  protected:
-  const int MAP_WIDTH = 400;
-  const int MAP_HEIGHT = 150;
+  const int MAP_WIDTH = 800;
+  const int MAP_HEIGHT = 500;
   const int SIDEBAR_WIDTH = 40;
   int width, height;
   Panel map_panel;
@@ -72,6 +72,7 @@ class Engine {
   void Run();
   void Term();
   void NextLevel();
+  void Load(bool pause=false);
   bool CursorOnMap();
 };
 

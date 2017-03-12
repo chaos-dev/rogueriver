@@ -36,8 +36,8 @@ class River {
   const int length;
   const float min_width = 15;
   const float max_width = 40;
-  const float min_travel = 30;
-  const float max_travel = 90;
+  const float min_travel = 220;
+  const float max_travel = 280;
   const int num_periods = 3;
   const int rock_spacing = 2;
   std::vector<float> width;

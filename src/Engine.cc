@@ -23,6 +23,7 @@
 #include "Actor.h"
 #include "Ai.h"
 #include "Attacker.h"
+#include "Menu.h"
 
 #include "BearLibTerminal.h"
 
@@ -67,7 +68,7 @@ void Engine::Init() {
   player = new Actor(player_start.x, player_start.y, (int)'@', Color(240,240,240), 1);
   player->words = new Words("you","You","your corpse","your","sling","robes");
   player->ai = new PlayerAi();
-  player->destructible=new PlayerDestructible(100,2);
+  player->destructible=new PlayerDestructible(20,2);
   player->attacker = new Attacker(15,16,3,12);
   engine.actors.push_back(player);
   
@@ -87,21 +88,34 @@ void Engine::Term() {
 }
 
 void Engine::ProcessInput() {
-    while (terminal_has_input()) {
-      int key = terminal_read();
-      bool shift = terminal_check(TK_SHIFT);
-      if (game_status == AIMING) {
-        int x, y;
-        engine.PickATile(key, &x, &y, player->attacker->max_range);
-      } else {
-        player->ProcessInput(key, shift);
-      }
-      gui->ProcessInput(key);
-      if (key == TK_CLOSE || key == TK_ESCAPE) {
-        status = CLOSED;
-      } else if (key == TK_MOUSE_MOVE) {
-        UpdateMouse(); // This is actually redundant.
-      }
+  while (terminal_has_input()) {
+    int key = terminal_read();
+    bool shift = terminal_check(TK_SHIFT);
+    if (game_status == AIMING) {
+      int x, y;
+      engine.PickATile(key, &x, &y, player->attacker->max_range);
+    } else {
+      player->ProcessInput(key, shift);
+    }
+    gui->ProcessInput(key);
+    if (key == TK_CLOSE) {
+      status = CLOSED;
+    } else if (key == TK_ESCAPE) {
+      engine.gui->menu.clear();
+	    engine.gui->menu.addItem(Menu::RESUME,"Resume");
+	    engine.gui->menu.addItem(Menu::NEW_GAME,"New game");
+	    engine.gui->menu.addItem(Menu::EXIT,"Exit");
+	    Menu::MenuItemCode menuItem=engine.gui->menu.pick(Menu::PAUSE);
+      if ( menuItem == Menu::EXIT ) {
+		    status = CLOSED;
+	    } else if ( menuItem == Menu::NEW_GAME ) {
+		    // New game
+		    engine.Term();
+		    engine.Init();
+	    }
+    } else if (key == TK_MOUSE_MOVE) {
+      UpdateMouse(); // This is actually redundant.
+    }
   }
 };
 
@@ -170,6 +184,24 @@ void Engine::Run() {
         Render();
         ProcessInput();
   }
+};
+
+void Engine::Load(bool pause) {
+  engine.gui->menu.clear();
+	engine.gui->menu.addItem(Menu::NEW_GAME,"New game");
+	engine.gui->menu.addItem(Menu::EXIT,"Exit");
+	
+	Menu::MenuItemCode menuItem=engine.gui->menu.pick(
+	    pause ? Menu::PAUSE : Menu::MAIN);
+  if ( menuItem == Menu::EXIT || menuItem == Menu::NONE ) {
+		// Exit or window closed
+		exit(0);
+	} else if ( menuItem == Menu::NEW_GAME ) {
+		// New game
+	  engine.gui->menu.addItem(Menu::RESUME,"Resume");
+		engine.Term();
+		engine.Init();
+	}
 };
 
 bool Engine::CursorOnMap() {

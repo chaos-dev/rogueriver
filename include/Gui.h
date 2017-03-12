@@ -25,6 +25,7 @@
 #include <sstream>
 
 #include "Color.h"
+#include "Menu.h"
 
 // A string plus its precalculated height.
 struct Message {
@@ -84,11 +85,13 @@ class Gui {
   const char* GetTitle();
  public:
   Log* log;
+  Menu menu;
   Gui(int sidebar_width);
   void ProcessInput(int key);
   void Update();
   void Render();
   void Clear();
+  void DrawFrame(int x, int y, int width, int height);
 };
 
 #endif // INCLUDE_GUI_H

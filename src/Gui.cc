@@ -128,10 +128,11 @@ void Log::Render() {
                 frame_width, frame_height);
 
   // Scroll bar
-  terminal_layer(6);
+  terminal_layer(0);
   terminal_bkcolor("darker gray");
   terminal_clear_area(sidebar_start+padding_left+frame_width, padding_top,
                       1, frame_height);
+  terminal_layer(6);
   terminal_bkcolor("none");
   terminal_color("dark orange");
   for (int i = 0; i < scrollbar_height; i++) {
@@ -359,3 +360,19 @@ void Gui::RenderHelp(int x, int y) {
                        "Press the arrow/numpad/vi keys to move, or press 'f' to fire.");
   };
 };
+
+void Gui::DrawFrame(int x, int y, int width, int height) {
+  int MAX_LAYER=10;
+  for (int i=0; i<MAX_LAYER+1;i++) {
+    terminal_layer(i);
+    terminal_bkcolor("black");
+    terminal_clear_area(x,y,width,height);
+    terminal_bkcolor("darkest gray");
+    terminal_clear_area(x+1,y+1,width-2,height-2);
+  };
+};
+
+
+
+
+

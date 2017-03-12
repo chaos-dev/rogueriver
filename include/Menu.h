@@ -1,6 +1,5 @@
 /**
- *  \brief Explore procedurally generated rivers in the Greek Underworld
- *
+ *  \brief  
  *  Copyright (C) 2017  Chaos-Dev
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,13 +16,33 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Engine.h"
+#ifndef INCLUDE_MENU_H_
+#define INCLUDE_MENU_H_
 
-Engine engine;
+#include <vector>
+ 
+class Menu {
+public :
+	enum MenuItemCode {
+		NONE,
+		NEW_GAME,
+		RESUME,
+		EXIT
+	};
+	enum DisplayMode {
+		MAIN,
+		PAUSE
+	};
+	~Menu();
+	void clear();
+	void addItem(MenuItemCode code, const char *label);
+	MenuItemCode pick(DisplayMode mode=MAIN);
+protected :
+	struct MenuItem {
+		MenuItemCode code;
+		const char *label;
+	};
+	std::vector<MenuItem*> items;
+};
 
-int main() {
-   engine.Load();
-   engine.Run();
-	
-   return 0;
-}
+#endif

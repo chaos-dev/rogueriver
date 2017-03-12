@@ -89,7 +89,7 @@ void Map::PlaceMonsters() {
   int num_enemies = (int)(dist(engine.rng)*10+15);
   while (num_enemies > 0) {
     int x = (int)(dist(engine.rng)*width);
-    int y = (int)(dist(engine.rng)*height);
+    int y = (int)(dist(engine.rng)*100+200);
     
     if ((player.x-x)*(player.x-x)+(player.y-y)*(player.y-y) < 900) continue;
     
@@ -322,7 +322,7 @@ void Map::AddMonster(int x, int y) {
       }
       break;
     case 3:
-      if ( roll < 80 ) {
+      if ( roll < 70 ) {
         Actor* ghoul = CreateMonster(MonsterType::GHOUL, x, y);
         engine.actors.push_back(ghoul);
       } else {
@@ -359,7 +359,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
   Actor* monster = nullptr;
   switch (monster_type) {
     case GHOST:
-      monster = new Actor(x,y,'g',Color(138,112,144),1);
+      monster = new Actor(x,y,'g',Color(241,224,197),1);
       switch (roll%4) {
         case 0:
           monster->words = new Words("the ghost","The ghost","dead ghost","his","javelin","shadowy form");
@@ -405,8 +405,8 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
     case CENTAUR:
       monster = new Actor(x,y,'c',Color(201,183,156),2);
       monster->words = new Words("the centaur","The centaur","dead centaur","his","arrow","skin");
-      monster->destructible = new MonsterDestructible(16,0);  
-      monster->attacker = new Attacker(20,9,14,150);
+      monster->destructible = new MonsterDestructible(16,0);
+      monster->attacker = new Attacker(9,9,7,150);
       monster->ai = new MonsterAi();
       return monster;
        
@@ -432,7 +432,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       monster = new Actor(x,y,'G',Color(130,115,92),2); 
       monster->words = new Words("the giant","The giant","dead giant","his","boulder","fur coat");
       monster->destructible = new MonsterDestructible(32,2);
-      monster->attacker = new Attacker(10,3,25,12);
+      monster->attacker = new Attacker(15,3,25,12);
       monster->ai = new MonsterAi();
       return monster;
     
@@ -534,26 +534,26 @@ Actor* Map::CreateItem(ItemType item_type, int x, int y) {
   switch (item_type) {
     case SHORTBOW:
       item = new Actor(x,y,')',Color(141,59,114),1);
-      item->words = new Words("short bow","Short bow"," ", " ", "arrows"," ");
-      item->item = new Item(5,150,0);
+      item->words = new Words("short bow","Short bow"," ", " ", "arrow"," ");
+      item->item = new Item(8,150,0);
       return item;
       
     case JAVELIN:
       item = new Actor(x,y,'/',Color(157,203,186),1);
       item->words = new Words("set of javelins", "Set of javelins", " ", " ", "javelin"," ");
-      item->item = new Item(7,35,0);
+      item->item = new Item(10,35,0);
       return item;
     
     case LONGBOW:
       item = new Actor(x,y,'}',Color(75,59,64),1);
       item->words = new Words("longbow","Longbow"," ", " ", "arrows"," ");
-      item->item = new Item(9,150,0);
+      item->item = new Item(12,150,0);
       return item;
       
     case ARTEMIS:
       item = new Actor(x,y,'}',Color(83,216,251),1);
-      item->words = new Words("Artemis's bow","Artemis's bow"," ", " ", "arrows"," ");
-      item->item = new Item(20,200,0);
+      item->words = new Words("Artemis's bow","Artemis's bow"," ", " ", "arrow"," ");
+      item->item = new Item(25,200,0);
       return item;
       
     case LEATHER:

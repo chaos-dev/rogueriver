@@ -108,7 +108,7 @@ void Attacker::Message(bool hits, bool penetrates, bool dodged, int damage, Acto
 	if (target->destructible) {
 	    if ( dodged ) {
 		    const char* temp_word = ((owner == engine.player)? "r" : "'s");
-		    const char* temp_word2 = ((owner == engine.player)? "dodge" : "dodges");
+		    const char* temp_word2 = ((target == engine.player)? "dodge" : "dodges");
 			engine.gui->log->Print("%s %s away from %s%s %s.",
 			                       target->words->Name, temp_word2,
 			                       owner->words->name, temp_word, 
