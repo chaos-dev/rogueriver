@@ -155,12 +155,14 @@ void Map::PlaceRocks() {
     if (rock.width == 1) {
       Actor* actor = new Actor(rock.x, rock.y, '*', rock_color,1);
        actor->words = new Words("rock","Rock"," "," "," "," ");
+       actor->blocks = false;
       engine.actors.push_back(actor);
     } else {
       Actor* actor;
       for (int i=0; i<rock.width; i++) {
        Actor* actor = new Actor(rock.x, rock.y+i, '*', rock_color,1);
        actor->words = new Words("rock","Rock"," "," "," "," ");
+       actor->blocks = false;
        engine.actors.push_back(actor);
       };
     };
@@ -394,8 +396,8 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       return monster;
       
     case GHOUL:
-      monster = new Actor(x,y,'g',Color(62,137,20),1);
-      monster->words = new Words("the ghoul","The ghoul","pile of bones","his","acidic blood","bones");
+      monster = new Actor(x,y,'g',Color(161,195,73),1);
+      monster->words = new Words("the ghoul","The ghoul","pile of bones","his","acidic vomit","flesh");
       if (roll%2 == 0) monster->words->possessive = "her";
       monster->destructible = new MonsterDestructible(19,0);
       monster->attacker = new Attacker(7,12,9,12);
@@ -406,7 +408,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       monster = new Actor(x,y,'c',Color(201,183,156),2);
       monster->words = new Words("the centaur","The centaur","dead centaur","his","arrow","skin");
       monster->destructible = new MonsterDestructible(16,0);
-      monster->attacker = new Attacker(9,9,7,150);
+      monster->attacker = new Attacker(11,9,7,150);
       monster->ai = new MonsterAi();
       return monster;
        
@@ -545,7 +547,7 @@ Actor* Map::CreateItem(ItemType item_type, int x, int y) {
       return item;
     
     case LONGBOW:
-      item = new Actor(x,y,'}',Color(75,59,64),1);
+      item = new Actor(x,y,'}',Color(242,163,89),1);
       item->words = new Words("longbow","Longbow"," ", " ", "arrows"," ");
       item->item = new Item(12,150,0);
       return item;

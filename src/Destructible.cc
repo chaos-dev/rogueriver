@@ -78,7 +78,7 @@ PlayerDestructible::PlayerDestructible(int maxHp, int armor) :
 }
 
 void PlayerDestructible::die(Actor *owner) {
-	engine.gui->log->Print("[color=flame]You died!");
+	engine.gui->log->Print("[color=flame]You dissapear into mere shadow.");
 	owner->symbol='%';
 	owner->color=Color(136,13,3);
 	Destructible::die(owner);
@@ -97,6 +97,7 @@ RaftDestructible::RaftDestructible(int maxHp, int armor) :
 
 void RaftDestructible::die(Actor *owner) {
 	engine.gui->log->Print("Your raft is destroyed!");
+	engine.gui->log->Print("[color=yellow]With no raft to escape and enemies closing in, your fate is sealed.");
 	owner->symbol='=';
 	owner->color=Color(139,69,19);
 	Destructible::die(owner);

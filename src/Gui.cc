@@ -29,9 +29,8 @@
 Log::Log(int sidebar_width) : sidebar_width(sidebar_width), duplicate_count(1) {
   Clear();
   const std::string prompt =
-      "Midway upon the journey of your life, you find yourself within a forest dark...";
+      "----------------------------------";
   messages.push_back(Message(prompt));
-  Print("----------------------------------");
   UpdateGeometry();
 };
 
@@ -45,14 +44,16 @@ void Log::Print(const char* message, ...) {
   
   std::string str(buf);
   
-  // Compare this message to the last one
-  const std::string last_msg = messages.back().text;
-  if (str.compare(0,str.size(),last_msg,0,str.size()) == 0) {
-    duplicate_count++;
-    messages.pop_back();
-    str += " [[x" + std::to_string(duplicate_count) + "]]";
-  } else {
-    duplicate_count = 1;
+  if (messages.size() > 0) {
+    // Compare this message to the last one
+    const std::string last_msg = messages.back().text;
+    if (str.compare(0,str.size(),last_msg,0,str.size()) == 0) {
+      duplicate_count++;
+      messages.pop_back();
+      str += " [[x" + std::to_string(duplicate_count) + "]]";
+    } else {
+      duplicate_count = 1;
+    }
   }
   
   messages.push_back(Message(str));
@@ -98,7 +99,7 @@ void Log::ProcessInput(int key) {
 
 void Log::Render() {
   // Frame background
-  terminal_layer(0);
+  terminal_layer(Engine::MAP);
   terminal_bkcolor("darkest gray");
   terminal_clear_area(sidebar_start+padding_left, padding_top,
                       frame_width, frame_height);
@@ -117,7 +118,7 @@ void Log::Render() {
   int delta = first_line - frame_offset;
 
   // Drawing messages (+crop)
-  terminal_layer(5);
+  terminal_layer(Engine::LOG_TEXT);
   for (; index < messages.size() && delta <= frame_height; index++){
     auto& message = messages[index];
     terminal_print_ext(sidebar_start+padding_left, padding_top+delta, 
@@ -128,16 +129,18 @@ void Log::Render() {
                 frame_width, frame_height);
 
   // Scroll bar
-  terminal_layer(0);
+  terminal_layer(Engine::MAP);
   terminal_bkcolor("darker gray");
   terminal_clear_area(sidebar_start+padding_left+frame_width, padding_top,
                       1, frame_height);
-  terminal_layer(6);
+  terminal_layer(Engine::LOG_CONTROLS);
   terminal_bkcolor("none");
   terminal_color("dark orange");
   for (int i = 0; i < scrollbar_height; i++) {
     terminal_put_ext(scrollbar_column, i, 0, scrollbar_offset, 0x2588, 0);
   }
+  terminal_crop(scrollbar_column, padding_top,
+                1, frame_height);
 
   // Put the colors back to their defaults.
   terminal_color("white");
@@ -244,10 +247,10 @@ const char* Gui::GetTitle() {
 void Gui::Render() {
   int sidebar_start = terminal_state(TK_WIDTH) - sidebar_width;
   
-  terminal_layer(0);
+  terminal_layer(Engine::MAP);
   terminal_bkcolor("darkest gray");
   terminal_clear_area(sidebar_start+1,1,sidebar_width-2,11);
-  terminal_layer(2);
+  terminal_layer(Engine::SIDEBAR_TEXT);
   const char* title = GetTitle();
   terminal_print_ext(sidebar_start+1,1, sidebar_width-4, 0, TK_ALIGN_CENTER,
                      title);
@@ -277,13 +280,13 @@ void Gui::RenderBar(int x, int y, int width, int offset, const char *name,
 		            const Color backColor) {
   int block_symbol = 0x2588;
   // Fill in the background.
-  terminal_layer(0);
+  terminal_layer(Engine::MAP);
   terminal_bkcolor(backColor.Convert());
   terminal_clear_area(x,y,width,1);
   terminal_bkcolor("none");
   
   // Fill in the bar
-  terminal_layer(6);
+  terminal_layer(Engine::SIDEBAR_TEXT);
   int bar_width = (int)(value / maxValue * width);
   if (bar_width > 0) {
     terminal_color(barColor.Convert());
@@ -291,7 +294,7 @@ void Gui::RenderBar(int x, int y, int width, int offset, const char *name,
   }
   
   // Print the text on top of the bar
-  terminal_layer(7);
+  terminal_layer(Engine::SIDEBAR_CONTROLS);
   terminal_color("white");
   terminal_printf(x+width/2-offset, y, "%s : %g/%g", name, value, maxValue);
   
@@ -355,6 +358,11 @@ void Gui::RenderHelp(int x, int y) {
                         engine.player->attacker->max_range);
     }
     terminal_color("white");
+  } else if (engine.game_status == Engine::DEFEAT) {
+    terminal_color("yellow");
+    terminal_print_ext(x, y, sidebar_width-4, 0, TK_ALIGN_DEFAULT,
+                     "Press ESC to start a new game or exit.");
+    terminal_color("white");    
   } else {
     terminal_print_ext(x, y, sidebar_width-4, 0, TK_ALIGN_DEFAULT, 
                        "Press the arrow/numpad/vi keys to move, or press 'f' to fire.");
@@ -362,7 +370,7 @@ void Gui::RenderHelp(int x, int y) {
 };
 
 void Gui::DrawFrame(int x, int y, int width, int height) {
-  int MAX_LAYER=10;
+  int MAX_LAYER=11;
   for (int i=0; i<MAX_LAYER+1;i++) {
     terminal_layer(i);
     terminal_bkcolor("black");
@@ -372,7 +380,23 @@ void Gui::DrawFrame(int x, int y, int width, int height) {
   };
 };
 
+void Gui::MessageBox(const char* message) {
+  int MESSAGE_WIDTH = 40;
+  int MESSAGE_HEIGHT = 12;
+  terminal_layer(Engine::DIALOG_BOXES);
+  int x = terminal_state(TK_WIDTH)/2 - MESSAGE_WIDTH/2;
+  int y = terminal_state(TK_HEIGHT)/2 - MESSAGE_HEIGHT/2;
+  DrawFrame(x,y,MESSAGE_WIDTH,MESSAGE_HEIGHT);
+  terminal_color("white");
+  terminal_print_ext(x+2,y+2, MESSAGE_WIDTH-4, 0, TK_ALIGN_DEFAULT, message);
+  terminal_print(x+2,y+MESSAGE_HEIGHT-2,"[color=lighter grey]Press the spacebar to continue.");
+  terminal_refresh();
+  while(terminal_read() != TK_SPACE) {
+  };
+  // Set the terminal back
+  terminal_set("input.filter={keyboard, mouse+}, precise-mouse=true");
 
+};
 
 
 

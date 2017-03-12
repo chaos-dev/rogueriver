@@ -37,7 +37,7 @@ void Menu::addItem(MenuItemCode code, const char *label) {
 	items.push_back(item);
 }
 
-const int PAUSE_MENU_WIDTH=18;
+const int PAUSE_MENU_WIDTH=16;
 const int PAUSE_MENU_HEIGHT=11;
 Menu::MenuItemCode Menu::pick(DisplayMode mode) {
 	int selectedItem=0;
@@ -70,6 +70,7 @@ Menu::MenuItemCode Menu::pick(DisplayMode mode) {
 	  terminal_put(35, 6, 0xE200); // Background
 
 	}
+	terminal_refresh();
   
   bool exit = false;
   while (!exit) {

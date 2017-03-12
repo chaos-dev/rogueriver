@@ -36,8 +36,6 @@ class Engine {
   int width, height;
   Panel map_panel;
   const int symbol = 0x2588;
-  enum Status {OPEN,
-               CLOSED} status;
 
   void ProcessInput();
   void Update();
@@ -57,6 +55,19 @@ class Engine {
   Gui* gui;
   std::deque<Actor*> actors;
   std::mt19937 rng;  // Random number generator
+  enum TileLayer {
+    MAP=0,
+    ACTORS,
+    SIDEBAR_BG,
+    SIDEBAR_TEXT,
+    SIDEBAR_CONTROLS,
+    LOG_BG,
+    LOG_TEXT,
+    LOG_CONTROLS,
+    DIALOG_BOXES,
+    PAUSE_MENU
+  };
+    
   enum GameStatus {
     STARTUP,
     IDLE,
@@ -65,6 +76,8 @@ class Engine {
     VICTORY,
     DEFEAT
   } game_status;
+  enum Status {OPEN,
+               CLOSED} status;
 
   Engine();
   ~Engine();

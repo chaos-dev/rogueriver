@@ -146,6 +146,8 @@ void PlayerAi::Update(Actor *owner) {
         return;
   }
   
+  if ( engine.game_status == Engine::DEFEAT ) return;
+  
   if (engine.game_status == Engine::AIMING) {
     if (owner->attacker->UpdateFiring(owner)) {
         dx = 0; dy = 0;
@@ -265,27 +267,28 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
   
   if (owner->x > engine.map->width-engine.NEXT_LEVEL_POINT) {
     engine.NextLevel();
-  };
-  
-  bool moved = (owner->x != temp_x || owner->y != temp_y);
-  if ((targetx != owner->x || targety != owner->y) && !moved && !attacking)
-      engine.gui->log->Print("You fight the current, but make no progress.");
-  if ((targetx < owner->x) && (targetx < temp_x) && moved)
-      engine.gui->log->Print("Despite your efforts, the current takes you downstream.");
-  
-  if (moved && on_raft) CheckRaftDamage(owner, temp_x, temp_y);
-  
-  if (on_raft) {
-    if (engine.map->isWater(targetx, targety)) {
-      // Move the raft with the player.
-      engine.raft->x = owner->x; engine.raft->y = owner->y;
-    } else {
-      engine.gui->log->Print("You climb off the raft.");
-    }
   } else {
-    if ((engine.player->x == engine.raft->x) && 
-        (engine.player->y == engine.raft->y)) {
-      engine.gui->log->Print("You board the raft.");
+  
+    bool moved = (owner->x != temp_x || owner->y != temp_y);
+    if ((targetx != owner->x || targety != owner->y) && !moved && !attacking)
+        engine.gui->log->Print("You fight the current, but make no progress.");
+    if ((targetx < owner->x) && (targetx < temp_x) && moved)
+        engine.gui->log->Print("Despite your efforts, the current takes you downstream.");
+    
+    if (moved && on_raft) CheckRaftDamage(owner, temp_x, temp_y);
+    
+    if (on_raft) {
+      if (engine.map->isWater(targetx, targety)) {
+        // Move the raft with the player.
+        engine.raft->x = owner->x; engine.raft->y = owner->y;
+      } else {
+        engine.gui->log->Print("You climb off the raft.");
+      }
+    } else {
+      if ((engine.player->x == engine.raft->x) && 
+          (engine.player->y == engine.raft->y)) {
+        engine.gui->log->Print("You board the raft.");
+      }
     }
   }
   

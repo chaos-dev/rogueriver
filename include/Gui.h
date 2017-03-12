@@ -91,6 +91,7 @@ class Gui {
   void Update();
   void Render();
   void Clear();
+  void MessageBox(const char* message);
   void DrawFrame(int x, int y, int width, int height);
 };
 

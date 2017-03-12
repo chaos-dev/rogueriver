@@ -54,6 +54,7 @@ Engine::~Engine() {
 };
 
 void Engine::Init() {
+  level=1;
   // Seed RNG
   rng.seed(std::random_device()());
 
@@ -68,16 +69,24 @@ void Engine::Init() {
   player = new Actor(player_start.x, player_start.y, (int)'@', Color(240,240,240), 1);
   player->words = new Words("you","You","your corpse","your","sling","robes");
   player->ai = new PlayerAi();
-  player->destructible=new PlayerDestructible(20,2);
+  player->destructible=new PlayerDestructible(100,15);
   player->attacker = new Attacker(15,16,3,12);
   engine.actors.push_back(player);
   
   // Create raft
   raft = new Actor(player_start.x, player_start.y-2, (int)'#', Color(129,76,42), 1);
   raft->words = new Words("raft","Raft","pile of logs"," "," ","thick wood");
-  raft->destructible = new RaftDestructible(20,9);
+  raft->destructible = new RaftDestructible(100,9);
   raft->blocks = false;
   engine.actors.push_front(raft);
+  
+  engine.Update();
+  engine.Render();
+  engine.gui->MessageBox("Your loved one has been taken captive by Hades, and it is now up to you to save her! Hermes has shown you the way to Acheron, the river leading into the Underworld.");
+  engine.gui->MessageBox("Hermes: That there is Charon, the ferryman of the underworld.\n\nCharon: One coin will buy you passage down my river.");
+  engine.gui->MessageBox("You: I... I don't have any coins on me.");
+  engine.gui->MessageBox("Charon: Well, if you don't have a coin, then you're stuck here with these wandering ghosts. No obol, no passage.");
+  engine.gui->MessageBox("Hermes: It looks like you'll have to find another way down the river...");
 };
 
 void Engine::Term() {
@@ -91,16 +100,10 @@ void Engine::ProcessInput() {
   while (terminal_has_input()) {
     int key = terminal_read();
     bool shift = terminal_check(TK_SHIFT);
-    if (game_status == AIMING) {
-      int x, y;
-      engine.PickATile(key, &x, &y, player->attacker->max_range);
-    } else {
-      player->ProcessInput(key, shift);
-    }
     gui->ProcessInput(key);
     if (key == TK_CLOSE) {
       status = CLOSED;
-    } else if (key == TK_ESCAPE) {
+    } else if (key == TK_ESCAPE && game_status != AIMING) {
       engine.gui->menu.clear();
 	    engine.gui->menu.addItem(Menu::RESUME,"Resume");
 	    engine.gui->menu.addItem(Menu::NEW_GAME,"New game");
@@ -110,11 +113,18 @@ void Engine::ProcessInput() {
 		    status = CLOSED;
 	    } else if ( menuItem == Menu::NEW_GAME ) {
 		    // New game
+		    game_status = STARTUP;
 		    engine.Term();
 		    engine.Init();
 	    }
     } else if (key == TK_MOUSE_MOVE) {
       UpdateMouse(); // This is actually redundant.
+    }
+    if (game_status == AIMING) {
+      int x, y;
+      engine.PickATile(key, &x, &y, player->attacker->max_range);
+    } else if (game_status == IDLE || game_status == STARTUP) {
+      player->ProcessInput(key, shift);
     }
   }
 };
@@ -128,14 +138,16 @@ void Engine::Render() {
   terminal_clear();
   
   // Map
-  terminal_layer(0);
+  terminal_layer(MAP);
   map->Render(map_panel, camera);
+  terminal_crop(0,0,map_panel.width-1, map_panel.height);
   
   // Actors
-  terminal_layer(1);
+  terminal_layer(ACTORS);
   for (Actor* actor : actors) {
     RenderActor(actor);
   };
+  terminal_crop(0,0,map_panel.width-1, map_panel.height);
   
   // Gui
   gui->Render();
@@ -158,17 +170,18 @@ void Engine::RenderActor(Actor* actor) {
 };
 
 void Engine::Update() {
-  if (game_status != AIMING) {
-      game_status = IDLE;
-  }
-  player->Update();
-  if (game_status == NEW_TURN) {
-    UpdateMouse(); // Map may have moved...
-    for (Actor* actor : actors) {
-        if (actor != player) actor->Update();
+  if (game_status != DEFEAT) {
+    if (game_status != AIMING) {
+        game_status = IDLE;
     }
-  }
-
+    player->Update();
+    if (game_status == NEW_TURN) {
+      UpdateMouse(); // Map may have moved...
+      for (Actor* actor : actors) {
+          if (actor != player) actor->Update();
+      }
+    }
+  };
   // Update the map
   width = terminal_state(TK_WIDTH);
   height = terminal_state(TK_HEIGHT);
@@ -225,7 +238,7 @@ bool Engine::PickATile(int key, int *x, int *y, int max_range) {
       engine.gui->log->Print("Your max range is %d m.\nThat space is %.1f m away.",
                              max_range, distance);
     }
-  } else if (key == TK_SPACE) {
+  } else if (key == TK_SPACE || key == TK_ESCAPE) {
     engine.gui->log->Print("Firing canceled.");
     engine.game_status = IDLE;
   }
@@ -236,21 +249,46 @@ void Engine::NextLevel() {
   level++;
   switch (level) {
     case 2:
+      engine.gui->MessageBox("You: Up ahead are the cliffs leading down to the underworld.  I'll have to find a way around the waterfall.");
       engine.gui->log->Print("[color=amber]You carry your raft past the waterfall to the next section of the river.");
       break;
     case 3:
-      engine.gui->log->Print("[color=amber]You paddle ahead to where the river enters a cave.");
+      engine.gui->MessageBox("You: Here it is! It's the cave leading down into the depths of the kingdom of Hades.");
+      engine.gui->log->Print("[color=amber]You paddle ahead to where the river enters a dark cave.");
       break;
     case 4:
+      engine.gui->MessageBox("You: That fork up ahead must be the one Hermes told me about.");
       engine.gui->log->Print("[color=amber]You race away from the harpies, entering a dark fork of the cave.");
       break;
     case 5:
-      engine.gui->log->Print("[color=amber]You enter another fork of the cave, where the river has the color of blood.");
+      engine.gui->MessageBox("You: I've reached the last fork.  If I cut through here, I'll be right at the throne of Hades.");
+      engine.gui->log->Print("[color=amber]You enter another fork of the cave, where the air is hot and the water hotter.");
       break;
    };
    
   if (level == 6) {
-    // TODO: End condition
+      engine.gui->MessageBox("Hades: Well done. I have quite enjoyed the show! You are indeed a mighty warrior. And you've managed to find some of the old relics I have been borrowing...");
+      engine.gui->MessageBox("You: I'll fight you too, if need be!");
+      engine.gui->MessageBox("Hades: There's no need for that.  You can take your place in the Elysian fields, among the other fallen warriors.");
+      engine.gui->MessageBox("You: What do you mean? I'm here to take my love back to the surface.");
+      engine.gui->MessageBox("Your love: My dear, I'm right here.");
+      engine.gui->MessageBox("Hades: There seems to be a misunderstanding.  You see, you're already...");
+      engine.gui->MessageBox("Your love: Our house burned down last night.  We both died in the fire.");
+      engine.gui->MessageBox("You: So that means...I'm...");
+      engine.gui->MessageBox("Hades: A powerful hero, who has earned his place among the champions of our time.");
+      engine.gui->MessageBox("               THE END               ");
+      engine.gui->menu.clear();
+	    engine.gui->menu.addItem(Menu::NEW_GAME,"New game");
+	    engine.gui->menu.addItem(Menu::EXIT,"Exit");
+	    Menu::MenuItemCode menuItem=engine.gui->menu.pick(Menu::PAUSE);
+      if ( menuItem == Menu::EXIT || menuItem == Menu::NONE ) {
+		    status = CLOSED;
+	    } else if ( menuItem == Menu::NEW_GAME ) {
+		    // New game
+		    game_status = STARTUP;
+		    engine.Term();
+		    engine.Init();
+	    }
   } else {
     delete map;
     
