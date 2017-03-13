@@ -3,9 +3,9 @@
 cmake_minimum_required(VERSION 2.8.0)
 
 project(RogueRiver C CXX)
-set (RogueRiver_VERSION_MAJOR 0)
-set (RogueRiver_VERSION_MINOR 1)
-set (RogueRiver_VERSION_PATCH 1)
+set (RogueRiver_VERSION_MAJOR 1)
+set (RogueRiver_VERSION_MINOR 0)
+set (RogueRiver_VERSION_PATCH 0)
 
 # We require C++14
 set(CMAKE_CXX_STANDARD 14)

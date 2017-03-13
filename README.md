@@ -1,12 +1,16 @@
 # Rogue River: Obol of Charon
-Explore five procedurally generated rivers as you fight to reclaim your
-loved one from the Greek Underworld.
+Explore five procedurally generated rivers as you fight to reclaim your loved one from the Greek Underworld.
 
 ![screenshot](Screenshot.png?raw=true)
 
 **Linux/OSX**: [![Build Status](https://travis-ci.org/chaos-dev/rogueriver.svg)](https://travis-ci.org/chaos-dev/rogueriver)
-
 **Windows**: [![Build status](https://ci.appveyor.com/api/projects/status/pxr3eg4fyw70s0am/branch/master?svg=true)](https://ci.appveyor.com/project/chaos-dev/rogueriver/branch/master)
+
+This roguelike game was created for the 2017 Seven-Day Roguelike Challenge.
+
+## Downloading
+ 
+You can downloads Windows, OSX, and Linux releases from [the Github Releases page](https://github.com/chaos-dev/rogueriver/releases).
 
 ## Compiling from Source
 
@@ -43,4 +47,10 @@ cmake --build . --config Release
 
 #### I found a bug. What do I do?
 
-Please report any issues on the Github Issues page.
+Please report any problems on the [Github Issues page](https://github.com/chaos-dev/rogueriver/issues).
+
+#### Will there be further development or versions of this game?
+
+This game was created for the 2017 7-Day Roguelike Challenge, and was completed
+for that challenge.  Expanding it would go against the spirit of the challenge.
+The current plan is to only release fixes, but not new features or a 2.0.0 version.

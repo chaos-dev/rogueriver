@@ -16,4 +16,15 @@ after_build:
     - cpack
 
 artifacts:
-  - path: '**\*.zip'
+  - path: 'build\*.zip'
+    name: Releases
+
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: 1WeDROrbv0cmMJfVQIANpP6T5IGFfXGTaAcrEYbfkQypeblPFeM1WS6fZiMTE7Z6
+  artifact: 'build\*.zip'
+  draft: false
+  prerelease: false
+  on:
+    appveyor_repo_tag: true

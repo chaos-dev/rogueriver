@@ -35,3 +35,16 @@ script: make
 
 after_success:
     - cpack
+    
+before_deploy:
+  - export FILE_TO_UPLOAD=$(ls build/*.tar.gz)
+
+deploy:
+  provider: releases
+  api_key:
+    - secure: "rL97NF5mmkWsD23pAf5mvzHEAWs2qOi7e69zEbWZLSGyBmNqMp0Efq+bRM6h6RgULy2SQUnVvwulT9NTWpmz4W6eJhMS/6x9rZuCqTkq1JipQuUWQ+T6U0D2xmWwQOQ0xlJEZgTOPe9FCeONYYUu5HHS829Nl2LEIegyz8vG96cKjwlRU8nCQC5V5lduSSxGtvlHD84qES1g3JWBMTHGGsoWoc4WnZGIGRTJzzR7a1uXJj4wpEa0y6khODvZPTYLlzdZ6MkwbHplwIknlakjisRuPL2OY2TCawxRSOt0Rb/ktaLb9bDvji+/DY93l2b/8zJLra111NFJfnUwGnZ3C1obvoAzvD997nhfwyEvF5s4OzCcs9IuxkNTlyfEMcxbxN20+3YtuJp33YIMjm5RfDf+RUE2e+tUwpHNV3kIWbAAB6iAZer8HgezyO5OM7kVpA/df7QTCEECDvjXbsW9qwx9HOQsaRKMm1q2YYPsmd0gpzWfuHDUb/u4m3Z01FAmFv4UNf+kXL1ahQCHmDQCrcPxmH661EjLih5IKAelxv0qzw79ScjAFeI1mmOWaHKRY7PKrPbT15zTMFv3FnoLvSneCA4cQ9WgNf8p9UdT55Z1QjWSEjto2raMulsIE/w1XYc5d2cGhd7P5K1tfcw9py5r0IfYhePRIuN/PV5mBbk="
+  file_glob: true
+  file: "${FILE_TO_UPLOAD}"
+  skip_cleanup: true
+  on:
+    tags: true

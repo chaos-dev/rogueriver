@@ -496,10 +496,10 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       monster->ai = new MonsterAi();
       return monster;
     case THANATOS:
-      monster = new Actor(x,y,'T',Color(255,255,255),2);
-      monster->words = new Words("Thanatos","Thanatos","the corpse of Thanatos","his","sword of death","skin");
+      monster = new Actor(x,y,'T',Color(255,255,255),3);
+      monster->words = new Words("Thanatos","Thanatos","the corpse of Thanatos","his","sword of death","impenetrable skin");
       monster->destructible = new MonsterDestructible(100,100);
-      monster->attacker = new Attacker(20,20,100,1); 
+      monster->attacker = new Attacker(30,10,100,1); 
       monster->can_fly = true;
       monster->ai = new MonsterAi();
   }
