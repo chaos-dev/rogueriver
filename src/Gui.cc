@@ -154,6 +154,7 @@ void Log::Clear() {
 }
 
 void Log::Update() {
+  UpdateGeometry();
   scrollbar_column = sidebar_start + frame_width + padding_left;
   scrollbar_offset =
       (padding_top + (frame_height-scrollbar_height) * 
@@ -249,7 +250,7 @@ void Gui::Render() {
   
   terminal_layer(Engine::MAP);
   terminal_bkcolor("darkest gray");
-  terminal_clear_area(sidebar_start+1,1,sidebar_width-2,11);
+  terminal_clear_area(sidebar_start+1,1,sidebar_width-2,12);
   terminal_layer(Engine::SIDEBAR_TEXT);
   const char* title = GetTitle();
   terminal_print_ext(sidebar_start+1,1, sidebar_width-4, 0, TK_ALIGN_CENTER,
@@ -261,12 +262,12 @@ void Gui::Render() {
   RenderMouseLook(sidebar_start+2, 7);
   
   // health bar
-  RenderBar(sidebar_start+1, 13, sidebar_width-2, 7, "Health",
+  RenderBar(sidebar_start+1, 14, sidebar_width-2, 7, "Health",
             engine.player->destructible->hp,
             engine.player->destructible->maxHp,Color(136,13,3),Color(106,7,3));
             
   // raft integrity
-  RenderBar(sidebar_start+1, 15, sidebar_width-2, 12, "Raft Integrity:",
+  RenderBar(sidebar_start+1, 16, sidebar_width-2, 12, "Raft Integrity:",
             engine.raft->destructible->hp,
             engine.raft->destructible->maxHp,Color(129,76,42),Color(73,39,14));
   
@@ -303,6 +304,7 @@ void Gui::RenderBar(int x, int y, int width, int offset, const char *name,
 }
 
 void Gui::RenderMouseLook(int x, int y) {
+  int sidebar_start = terminal_state(TK_WIDTH) - sidebar_width;
   if (engine.CursorOnMap()) {
     char buf[128]=" ";
     bool first=true;
@@ -314,6 +316,11 @@ void Gui::RenderMouseLook(int x, int y) {
           strcat(buf, ", ");
         };
         strcat(buf, actor->words->name);
+        if (actor->destructible && !actor->destructible->isDead() &&
+            actor != engine.player && actor != engine.raft)
+          RenderBar(sidebar_start+1, y+5, sidebar_width-2, 9, "Enemy Health",
+            actor->destructible->hp,
+            actor->destructible->maxHp,Color(136,13,3),Color(106,7,3));
       };
     };
     terminal_printf(x, y, "Cursor X: %d  Y: %d", engine.mouse->x, engine.mouse->y);
@@ -383,7 +390,7 @@ void Gui::DrawFrame(int x, int y, int width, int height) {
 void Gui::MessageBox(const char* message) {
   int MESSAGE_WIDTH = 40;
   int MESSAGE_HEIGHT = 12;
-  terminal_layer(Engine::DIALOG_BOXES);
+  terminal_layer(Engine::DIALOG_BOX);
   int x = terminal_state(TK_WIDTH)/2 - MESSAGE_WIDTH/2;
   int y = terminal_state(TK_HEIGHT)/2 - MESSAGE_HEIGHT/2;
   DrawFrame(x,y,MESSAGE_WIDTH,MESSAGE_HEIGHT);
@@ -392,6 +399,7 @@ void Gui::MessageBox(const char* message) {
   terminal_print(x+2,y+MESSAGE_HEIGHT-2,"[color=lighter grey]Press the spacebar to continue.");
   terminal_refresh();
   while(terminal_read() != TK_SPACE) {
+    terminal_refresh();
   };
   // Set the terminal back
   terminal_set("input.filter={keyboard, mouse+}, precise-mouse=true");

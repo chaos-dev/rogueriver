@@ -69,21 +69,35 @@ void Engine::Init() {
   player = new Actor(player_start.x, player_start.y, (int)'@', Color(240,240,240), 1);
   player->words = new Words("you","You","your corpse","your","sling","robes");
   player->ai = new PlayerAi();
-  player->destructible=new PlayerDestructible(100,15);
+  player->destructible=new PlayerDestructible(20,3);
   player->attacker = new Attacker(15,16,3,12);
   engine.actors.push_back(player);
   
   // Create raft
   raft = new Actor(player_start.x, player_start.y-2, (int)'#', Color(129,76,42), 1);
   raft->words = new Words("raft","Raft","pile of logs"," "," ","thick wood");
-  raft->destructible = new RaftDestructible(100,9);
+  raft->destructible = new RaftDestructible(15,9);
   raft->blocks = false;
   engine.actors.push_front(raft);
   
+  Actor* charon = new Actor(player_start.x-4, player_start.y-1, (int)'@', Color(240,230,140),1);
+  charon->words = new Words("Charon","Charon"," "," "," "," ");
+  engine.actors.push_back(charon);
+  Actor* boatl = new Actor(player_start.x-5, player_start.y-1, (int)'{', Color(129,76,42),1);
+  boatl->words = new Words("Charon's boat","Charon's boat"," "," "," "," ");
+  engine.actors.push_back(boatl);
+  Actor* boatr = new Actor(player_start.x-3, player_start.y-1, (int)'}', Color(129,76,42),1);
+  boatr->words = new Words("Charon's boat","Charon's boat"," "," "," "," ");
+  engine.actors.push_back(boatr);
+  Actor* hermes = new Actor(player_start.x-2, player_start.y+2, (int)'@', Color(240,230,140),1);
+  hermes->words = new Words("Hermes","Hermes"," "," "," "," ");
+  engine.actors.push_back(hermes);
+  
   engine.Update();
   engine.Render();
-  engine.gui->MessageBox("Your loved one has been taken captive by Hades, and it is now up to you to save her! Hermes has shown you the way to Acheron, the river leading into the Underworld.");
-  engine.gui->MessageBox("Hermes: That there is Charon, the ferryman of the underworld.\n\nCharon: One coin will buy you passage down my river.");
+  engine.gui->MessageBox("Your loved one has been taken to the Underworld by Hades, and it is now up to you to save her! Hermes has shown you the way to Acheron, the river leading into the Underworld.");
+  engine.gui->MessageBox("Hermes: That there is Charon, the ferryman of the underworld.");
+  engine.gui->MessageBox("Charon: One coin will buy you passage down my river.");
   engine.gui->MessageBox("You: I... I don't have any coins on me.");
   engine.gui->MessageBox("Charon: Well, if you don't have a coin, then you're stuck here with these wandering ghosts. No obol, no passage.");
   engine.gui->MessageBox("Hermes: It looks like you'll have to find another way down the river...");
@@ -170,10 +184,11 @@ void Engine::RenderActor(Actor* actor) {
 };
 
 void Engine::Update() {
-  if (game_status != DEFEAT) {
-    if (game_status != AIMING) {
-        game_status = IDLE;
-    }
+  if (game_status == NEW_TURN || game_status == STARTUP || game_status == IDLE) {
+    game_status = IDLE;
+  } 
+  if (game_status == NEW_TURN || game_status == STARTUP || 
+      game_status == IDLE     || game_status == AIMING) {
     player->Update();
     if (game_status == NEW_TURN) {
       UpdateMouse(); // Map may have moved...
@@ -181,7 +196,7 @@ void Engine::Update() {
           if (actor != player) actor->Update();
       }
     }
-  };
+  }
   // Update the map
   width = terminal_state(TK_WIDTH);
   height = terminal_state(TK_HEIGHT);
@@ -232,7 +247,7 @@ bool Engine::PickATile(int key, int *x, int *y, int max_range) {
             actor->destructible && !actor->destructible->isDead()) {
           player->attacker->SetAim(actor);
           return true;
-        };   
+        }; 
       }
     } else {
       engine.gui->log->Print("Your max range is %d m.\nThat space is %.1f m away.",

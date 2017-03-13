@@ -82,11 +82,8 @@ class Map {
       CHIMERA,
       MANTICORE,
       DRAGON,
-      NESSUS,
-      CAUCUS,
-      FURY,
-      CHARYBDIS,
-      CERBERUS
+      CERBERUS,
+      THANATOS
   };
   enum ItemType {
     SHORTBOW,

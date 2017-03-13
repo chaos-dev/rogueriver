@@ -19,8 +19,10 @@
 #include "Menu.h"
 
 #include <iostream>
- 
+
 #include "BearLibTerminal.h"
+
+#include "Engine.h"
  
 Menu::~Menu() {
 	clear();
@@ -47,9 +49,8 @@ Menu::MenuItemCode Menu::pick(DisplayMode mode) {
 		menuy=terminal_state(TK_HEIGHT)/2-PAUSE_MENU_HEIGHT/2;
 		
 		// Print out a frame
-		for (int i=0; i<10; i++) {
+		for (int i=0; i<12; i++) {
 		  terminal_layer(i);
-		  terminal_composition(TK_OFF);
       terminal_bkcolor("black");
       terminal_clear_area(menux, menuy, PAUSE_MENU_WIDTH, PAUSE_MENU_HEIGHT);
       terminal_bkcolor("darkest gray");
@@ -61,21 +62,20 @@ Menu::MenuItemCode Menu::pick(DisplayMode mode) {
 	} else {
 		menux=10;
 		menuy=terminal_state(TK_HEIGHT)/3;
-	  terminal_layer(0);
+	  terminal_layer(Engine::MAP);
 	  terminal_clear();
 	  terminal_bkcolor("darkest gray");
     terminal_clear_area(4, 2, terminal_state(TK_WIDTH)-8, terminal_state(TK_HEIGHT)-4);
     terminal_print(menux,menuy-4,"[color=crimson]Rogue River:\nObol of Charon");
 	  terminal_set("U+E200: graphics/menu_background.jpg, resize=700x500");
 	  terminal_put(35, 6, 0xE200); // Background
-
 	}
 	terminal_refresh();
   
+  terminal_layer(Engine::PAUSE_MENU);
   bool exit = false;
   while (!exit) {
   	int currentItem=0;
-    terminal_layer(10);
   	for (MenuItem* item : items) {
 			if ( currentItem == selectedItem ) {
 				terminal_color(color_from_name("dark orange"));

@@ -58,13 +58,10 @@ void Map::Init(bool withActors) {
     }
   }
   
-  PlaceMonsters();
-  
-  PlaceItems();
-  
+  // Rocks have to go first, so they're on the bottom.
   PlaceRocks();
   
-  // Push the raft and the player back to the top so he's drawn last.
+  // Push the raft above the rocks
   for (int i=0; i<engine.actors.size(); i++) {
     if (engine.actors[i] == engine.raft) {
       engine.actors.erase(engine.actors.begin()+i);
@@ -73,6 +70,11 @@ void Map::Init(bool withActors) {
     };
   }
   
+  PlaceMonsters();
+  
+  PlaceItems();
+
+  // Push the player back to the top.
   for (int i=0; i<engine.actors.size(); i++) {
       if (engine.actors[i] == engine.player) {
       engine.actors.erase(engine.actors.begin()+i);
@@ -86,10 +88,10 @@ void Map::PlaceMonsters() {
   Position player = GetPlayerStart();
   
   std::uniform_real_distribution<> dist(0,1);
-  int num_enemies = (int)(dist(engine.rng)*10+15);
+  int num_enemies = 75-engine.level*5;
   while (num_enemies > 0) {
     int x = (int)(dist(engine.rng)*width);
-    int y = (int)(dist(engine.rng)*100+200);
+    int y = (int)(dist(engine.rng)*height);
     
     if ((player.x-x)*(player.x-x)+(player.y-y)*(player.y-y) < 900) continue;
     
@@ -103,6 +105,14 @@ void Map::PlaceMonsters() {
             num_enemies--;
         }
     };
+  };
+  
+  if (engine.level == 5) {
+    int x = 5;
+    int y = (int)(dist(engine.rng)*100+200);
+    
+    Actor* Thanatos = CreateMonster(MonsterType::THANATOS, x, y);
+    engine.actors.push_back(Thanatos);
   };
 }
 
@@ -131,6 +141,10 @@ void Map::PlaceItems() {
     
     if (CanWalk(x,y)) {
         AddWeapon(x,y);
+        if (engine.level == 4) {
+          Actor* chimera = CreateMonster(MonsterType::CHIMERA, x, y);
+          engine.actors.push_back(chimera);
+        };
         num_weapons--;
     };
   };
@@ -145,6 +159,10 @@ void Map::PlaceItems() {
     
     if (CanWalk(x,y)) {
         AddArmor(x,y);
+        if (engine.level == 4) {
+          Actor* cerberus = CreateMonster(MonsterType::CERBERUS, x, y);
+          engine.actors.push_back(cerberus);
+        };
         num_armor--;
     };
   };
@@ -152,6 +170,7 @@ void Map::PlaceItems() {
 
 void Map::PlaceRocks() {
   for (Rock rock : river->rocks) {
+    //if (rock.x == engine.raft->x && rock.y == engine.raft->y) continue;
     if (rock.width == 1) {
       Actor* actor = new Actor(rock.x, rock.y, '*', rock_color,1);
        actor->words = new Words("rock","Rock"," "," "," "," ");
@@ -315,7 +334,7 @@ void Map::AddMonster(int x, int y) {
       }
       break;
     case 2:
-      if ( roll < 70 ) {
+      if ( roll < 50 ) {
         Actor* centaur = CreateMonster(MonsterType::CENTAUR, x, y);
         engine.actors.push_back(centaur);
       } else {
@@ -342,7 +361,7 @@ void Map::AddMonster(int x, int y) {
       }
       break;
     case 5:
-      if ( roll < 70 ) {
+      if ( roll < 30 ) {
         Actor* giant = CreateMonster(MonsterType::DRAGON, x, y);
         engine.actors.push_back(giant);
       } else {
@@ -365,19 +384,19 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       switch (roll%4) {
         case 0:
           monster->words = new Words("the ghost","The ghost","dead ghost","his","javelin","shadowy form");
-          monster->attacker = new Attacker(6,6,6,32); 
+          monster->attacker = new Attacker(9,6,6,32); 
           break;
         case 1:
           monster->words = new Words("the ghost","The ghost","dead ghost","his","sling","shadowy form");
-          monster->attacker = new Attacker(6,6,3,12);
+          monster->attacker = new Attacker(9,6,3,12);
           break;
         case 2:
           monster->words = new Words("the ghost","The ghost","dead ghost","his","spear","shadowy form");
-          monster->attacker = new Attacker(6,6,5,1);
+          monster->attacker = new Attacker(9,6,5,1);
           break;
         default:
           monster->words = new Words("the ghost","The ghost","dead ghost","his","sword","shadowy form");
-          monster->attacker = new Attacker(6,6,5,1);
+          monster->attacker = new Attacker(9,6,5,1);
         break;
       }
       if (roll%2 == 0) monster->words->possessive = "her";
@@ -391,7 +410,7 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       monster->words = new Words("the skeleton","The skeleton","pile of bones","his","sword","bones");
       if (roll%2 == 0) monster->words->possessive = "her";
       monster->destructible = new MonsterDestructible(12,0);
-      monster->attacker = new Attacker(6,6,11,1);
+      monster->attacker = new Attacker(15,15,11,1);
       monster->ai = new MonsterAi();
       return monster;
       
@@ -400,20 +419,20 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
       monster->words = new Words("the ghoul","The ghoul","pile of bones","his","acidic vomit","flesh");
       if (roll%2 == 0) monster->words->possessive = "her";
       monster->destructible = new MonsterDestructible(19,0);
-      monster->attacker = new Attacker(7,12,9,12);
+      monster->attacker = new Attacker(20,12,6,12);
       monster->ai = new MonsterAi();
       return monster;
     
     case CENTAUR:
-      monster = new Actor(x,y,'c',Color(201,183,156),2);
+      monster = new Actor(x,y,'c',Color(213,160,33),2);
       monster->words = new Words("the centaur","The centaur","dead centaur","his","arrow","skin");
       monster->destructible = new MonsterDestructible(16,0);
-      monster->attacker = new Attacker(11,9,7,150);
+      monster->attacker = new Attacker(15,9,5,40);
       monster->ai = new MonsterAi();
       return monster;
        
     case HARPY:
-      monster = new Actor(x,y,'h',Color(213,160,33),3);
+      monster = new Actor(x,y,'h',Color(213,160,33),2);
       monster->words = new Words("the harpy","The harpy","dead harpy","her","claws","thick skin");
       monster->destructible = new MonsterDestructible(21,0);
       monster->can_fly = true;
@@ -457,24 +476,32 @@ Actor* Map::CreateMonster(Map::MonsterType monster_type, int x, int y) {
     case DRAGON:
       monster = new Actor(x,y,'D',Color(164,66,0),1);
       monster->words = new Words("the dragon","The dragon","dead dragon","her","fiery breath","scales");
-      monster->destructible = new MonsterDestructible(30,9);
-      monster->attacker = new Attacker(30,21,18,40); 
+      monster->destructible = new MonsterDestructible(30,12);
+      monster->attacker = new Attacker(20,6,18,40); 
       monster->can_fly = true;
       monster->ai = new MonsterAi();
       return monster;
-      
-    case NESSUS:
-      return nullptr;
-    case CHIMERA:
-      return nullptr;
-    case CAUCUS:
-      return nullptr;
-    case FURY:
-      return nullptr;
-    case CHARYBDIS:
-      return nullptr;
     case CERBERUS:
-      return nullptr;
+      monster = new Actor(x,y,'3',Color(255,255,255),2);
+      monster->words = new Words("Cerberus","Cerberus","Cerberus's corpse","his","teeth","thick hide");
+      monster->destructible = new MonsterDestructible(32,6);
+      monster->attacker = new Attacker(15,11,9,1);
+      monster->ai = new MonsterAi();
+      return monster;
+    case CHIMERA:
+      monster = new Actor(x,y,'C',Color(255,255,255),2);
+      monster->words = new Words("the chimera","The chimera","the chimera's corpse","his","fiery breath","thick hide");
+      monster->destructible = new MonsterDestructible(32,6);
+      monster->attacker = new Attacker(17,13,12,40);
+      monster->ai = new MonsterAi();
+      return monster;
+    case THANATOS:
+      monster = new Actor(x,y,'T',Color(255,255,255),2);
+      monster->words = new Words("Thanatos","Thanatos","the corpse of Thanatos","his","sword of death","skin");
+      monster->destructible = new MonsterDestructible(100,100);
+      monster->attacker = new Attacker(20,20,100,1); 
+      monster->can_fly = true;
+      monster->ai = new MonsterAi();
   }
   return monster;
 };
@@ -536,50 +563,58 @@ Actor* Map::CreateItem(ItemType item_type, int x, int y) {
   switch (item_type) {
     case SHORTBOW:
       item = new Actor(x,y,')',Color(141,59,114),1);
+      item->blocks = false;
       item->words = new Words("short bow","Short bow"," ", " ", "arrow"," ");
       item->item = new Item(8,150,0);
       return item;
       
     case JAVELIN:
       item = new Actor(x,y,'/',Color(157,203,186),1);
+      item->blocks = false;
       item->words = new Words("set of javelins", "Set of javelins", " ", " ", "javelin"," ");
       item->item = new Item(10,35,0);
       return item;
     
     case LONGBOW:
       item = new Actor(x,y,'}',Color(242,163,89),1);
+      item->blocks = false;
       item->words = new Words("longbow","Longbow"," ", " ", "arrows"," ");
       item->item = new Item(12,150,0);
       return item;
       
     case ARTEMIS:
       item = new Actor(x,y,'}',Color(83,216,251),1);
+      item->blocks = false;
       item->words = new Words("Artemis's bow","Artemis's bow"," ", " ", "arrow"," ");
       item->item = new Item(25,200,0);
       return item;
       
     case LEATHER:
       item = new Actor(x,y,'a',Color(220,191,133),1);
+      item->blocks = false;
       item->words = new Words("leather armor","Leather Armor"," ", " ", " "," ");
       item->item = new Item(0,0,3);
       return item;
     
     case BRONZE:
       item = new Actor(x,y,'a',Color(225,176,126),1);
+      item->blocks = false;
       item->words = new Words("bronze breastplate and helmet","Bronze breatplate and helmet"," ", " ", " "," ");
       item->item = new Item(0,0,6);
       return item;
       
     case ADAMANT:
       item = new Actor(x,y,'a',Color(61,163,93),1); 
+      item->blocks = false;
       item->words = new Words("adamant breastplate and helmet","Adamant breatplate and helmet"," ", " ", " "," ");
       item->item = new Item(0,0,10);
       return item;
       
     case ACHILLES:
       item = new Actor(x,y,'a',Color(102,195,255),1);
+      item->blocks = false;
       item->words = new Words("armor of Achilles","Armor of Achilles"," ", " ", " "," ");
-      item->item = new Item(0,0,500);
+      item->item = new Item(0,0,100);
       return item;
   }
   return nullptr;

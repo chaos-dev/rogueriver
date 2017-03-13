@@ -42,7 +42,7 @@ class Log {
   const int sidebar_width;
   const int padding_left = 1;
   const int padding_right = 1;
-  const int padding_top = 17;
+  const int padding_top = 18;
   const int padding_bottom = 1;
   const int mouse_scroll_step = 2; // 2 text rows per mouse wheel step.
   const int line_padding = 0;

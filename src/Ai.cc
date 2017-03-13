@@ -45,8 +45,7 @@ bool MonsterAi::isActive(Actor *owner) {
   }
   if (active) {
     return true;
-  } else if (std::sqrt(std::pow(float(engine.player->x-owner->x),2) +
-                       std::pow(float(engine.player->y-owner->y),2)) < 100.0) {
+  } else if (std::abs(owner->x - engine.player->x) < 60) {
     active = true;
     return true;
   } else {
@@ -198,7 +197,8 @@ void PlayerAi::ProcessInput(Actor *owner, int key, bool shift) {
  *          action, including trying to walk into walls.
  */
 bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
-
+  bool on_raft = ((engine.player->x == engine.raft->x) && 
+                  (engine.player->y == engine.raft->y));
   if ( engine.map->isWall(targetx,targety) ) return false;
   
   // look for living actors to attack
@@ -208,12 +208,14 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
     if ( actor->x == targetx && actor->y == targety ) {
       if (actor->destructible && !actor->destructible->isDead()
           && actor != engine.player && actor != engine.raft) {
+        //Attack the monster
         owner->attacker->Attack(owner, actor, -5);
         attacking = true;
         targetx = owner->x;
         targety = owner->y;
         break;
       } else if (actor->item) {
+         // Wield an item
         if (actor->item->damage > owner->attacker->mean_damage) {
           engine.gui->log->Print("[color=dark orange]You are now wielding the %s.",
                                  actor->words->name);
@@ -241,9 +243,13 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
       }
     }
   }
+  
+  if (!engine.map->CanWalk(targetx, targety) && attacking == false &&
+      (engine.player->x != targetx || engine.player->y != targety)) {
+    // We've stepped on a tile where we can't walk (an NPC, etc.)
+    return false;
+  };
 
-  bool on_raft = ((engine.player->x == engine.raft->x) && 
-                  (engine.player->y == engine.raft->y));
   bool target_is_raft = ((targetx == engine.raft->x) && 
                          (targety == engine.raft->y));
   if (engine.map->isWater(targetx, targety) && !on_raft && !attacking && !target_is_raft) {
@@ -276,6 +282,11 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
         engine.gui->log->Print("Despite your efforts, the current takes you downstream.");
     
     if (moved && on_raft) CheckRaftDamage(owner, temp_x, temp_y);
+    // We need this condition to ensure that the game doesn't reset to IDLE.
+    if (engine.raft->destructible->isDead()) {
+        engine.raft->x = owner->x; engine.raft->y = owner->y;
+        return false;
+    }
     
     if (on_raft) {
       if (engine.map->isWater(targetx, targety)) {
@@ -292,8 +303,29 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx,int targety) {
     }
   }
   
+  // Check to make sure the river hasn't moved us onto any tiles we shouldn't be on...
+  for (Actor* actor : engine.actors) {
+    if ( actor->blocks && actor->x == owner->x && actor->y == owner->y ) {
+      for (int i=0; i<9; i++) {
+         int move_x = -i%3 + actor->x;
+         int move_y = -i/3 + actor->y;
+         if (engine.map->isWall(move_x,move_y)) continue;
+         bool free = true;
+         for (Actor* other_actor : engine.actors) {
+            if ( other_actor->blocks && other_actor != actor &&
+                 other_actor->x == move_x && other_actor->y == move_y) {
+              free = false;
+              break;
+            };
+         };
+         if (free) { 
+           actor->x = move_x; actor->y = move_y;
+           break;
+         }
+       }
+    }
+   }
   return true;
-  
 }
 
 void PlayerAi::CheckRaftDamage(Actor *owner, int old_x, int old_y) {
