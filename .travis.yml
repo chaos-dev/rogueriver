@@ -47,4 +47,4 @@ deploy:
   file: "${FILE_TO_UPLOAD}"
   skip_cleanup: true
   on:
-    tags: false
+    tags: true
