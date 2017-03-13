@@ -17,14 +17,14 @@ after_build:
 
 artifacts:
   - path: 'build\*.zip'
-    name: Releases
+    name: Release
 
 deploy:
   provider: GitHub
   auth_token:
     secure: 1WeDROrbv0cmMJfVQIANpP6T5IGFfXGTaAcrEYbfkQypeblPFeM1WS6fZiMTE7Z6
-  artifact: 'build\*.zip'
+  artifact: Release
   draft: false
   prerelease: false
   on:
-    appveyor_repo_tag: true
+    appveyor_repo_tag: false

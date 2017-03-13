@@ -37,7 +37,7 @@ after_success:
     - cpack
     
 before_deploy:
-  - export FILE_TO_UPLOAD=$(ls build/*.tar.gz)
+  - export FILE_TO_UPLOAD=$(ls *.tar.gz)
 
 deploy:
   provider: releases
@@ -47,4 +47,4 @@ deploy:
   file: "${FILE_TO_UPLOAD}"
   skip_cleanup: true
   on:
-    tags: true
+    tags: false
