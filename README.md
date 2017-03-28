@@ -3,8 +3,9 @@ Explore five procedurally generated rivers as you fight to reclaim your loved on
 
 ![screenshot](Screenshot.png?raw=true)
 
-**Linux/OSX**: [![Build Status](https://travis-ci.org/chaos-dev/rogueriver.svg)](https://travis-ci.org/chaos-dev/rogueriver)
-**Windows**: [![Build status](https://ci.appveyor.com/api/projects/status/pxr3eg4fyw70s0am/branch/master?svg=true)](https://ci.appveyor.com/project/chaos-dev/rogueriver/branch/master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3faceb296121471b8dd59b0927c0c62e)](https://www.codacy.com/app/chaos-dev/rogueriver?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=chaos-dev/rogueriver&amp;utm_campaign=Badge_Grade)
+| **Linux/OSX**: [![Build Status](https://travis-ci.org/chaos-dev/rogueriver.svg)](https://travis-ci.org/chaos-dev/rogueriver)
+| **Windows**: [![Build status](https://ci.appveyor.com/api/projects/status/pxr3eg4fyw70s0am/branch/master?svg=true)](https://ci.appveyor.com/project/chaos-dev/rogueriver/branch/master)
 
 This roguelike game was created for the 2017 Seven-Day Roguelike Challenge. It uses [BearLibTerminal](http://foo.wyrd.name/en:bearlibterminal) as the graphical front-end.
 
